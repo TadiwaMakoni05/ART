@@ -11,115 +11,115 @@ def update_gamification(sender, instance, created, **kwargs):
     Award points and update streaks when an adherence log is created/updated.
     NOTE: We mostly care about creation or status change to 'taken'.
     """
-    if not created:
-        # If updated, complex logic might be needed to avoid double counting.
-        # For MVP, we assume points are awarded only on the first definitive status set.
-        # But if status changes from 'missed' to 'taken' (late), we might want to handle it.
-        # Let's simplisticly assume valid logs are permanent for now, or we just handle 'taken'
+    # If it's an update, we only care if it's now 'taken'
+    if not created and instance.status != 'taken':
         return
 
     patient = instance.patient
     profile, _ = PatientGamificationProfile.objects.get_or_create(patient=patient)
 
-    # 1. Calculate Points
-    points_to_award = 0
-    reason = ""
-
-    if instance.status == 'taken':
-        # Check timing
-        scheduled = instance.scheduled_time
-        actual = instance.actual_time or timezone.now()
-        
-        # Naive timezone aware comparison
-        diff = abs((actual - scheduled).total_seconds()) / 60 # minutes
-
-        if diff <= 15:
-            points_to_award = 10
-            reason = "Dose taken on time"
-        elif instance.is_snoozed:
-            points_to_award = 4
-            reason = "Dose taken after snooze"
-        else:
-            points_to_award = 6
-            reason = "Dose taken late"
-    
-    elif instance.status == 'missed':
+    # Check if we already awarded points for this log to prevent double counting on updates
+    # We assume if a transaction exists for this log, points were handled.
+    if PointTransaction.objects.filter(adherence_log=instance).exists():
+       # Points done. But we might need to check streak if this was the last pill to complete the day?
+       # For simplicity, let's allow streak check to proceed even if points were awarded, 
+       # BUT we must be careful not to increment streak twice for the same day.
+       # The streak logic below checks `if profile.last_streak_date != log_date` before incrementing.
+       pass
+    else:
+        # 1. Calculate Points
         points_to_award = 0
-        reason = "Dose missed"
-    
-    elif instance.status == 'snoozed':
-        # No points yet, wait for 'taken'
-        return
+        reason = ""
 
-    # Award Points
-    if points_to_award > 0:
-        profile.total_points += points_to_award
-        profile.save()
+        if instance.status == 'taken':
+            # Check timing
+            scheduled = instance.scheduled_time
+            actual = instance.actual_time or timezone.now()
+            
+            # Naive timezone aware comparison
+            # Ensure both are offset-aware or both naive
+            if timezone.is_aware(scheduled) and timezone.is_naive(actual):
+                actual = timezone.make_aware(actual)
+            elif timezone.is_naive(scheduled) and timezone.is_aware(actual):
+                scheduled = timezone.make_aware(scheduled)
+
+            diff = abs((actual - scheduled).total_seconds()) / 60 # minutes
+
+            if diff <= 15:
+                points_to_award = 10
+                reason = "Dose taken on time"
+            elif instance.is_snoozed:
+                points_to_award = 4
+                reason = "Dose taken after snooze"
+            else:
+                points_to_award = 6
+                reason = "Dose taken late"
         
-        PointTransaction.objects.create(
-            patient=patient,
-            adherence_log=instance,
-            points=points_to_award,
-            reason=reason
-        )
+        elif instance.status == 'missed':
+            points_to_award = 0
+            reason = "Dose missed"
+        
+        elif instance.status == 'snoozed':
+            # No points yet, wait for 'taken'
+            return
+
+        # Award Points
+        if points_to_award > 0:
+            profile.total_points += points_to_award
+            
+            PointTransaction.objects.create(
+                patient=patient,
+                adherence_log=instance,
+                points=points_to_award,
+                reason=reason
+            )
 
     # 2. Update Streak
     # Streak Logic: Consecutive days where ALL scheduled doses were taken.
-    # We need to check if *today* is complete to increment streak.
-    # Or simplified: Streak increments if a full day passes with 100% adherence.
-    # Real-time approach:
-    # Check if this was the last dose for the day?
-    # Easier approach for MVP:
-    # A streak is maintained if yesterday was perfect.
-    # If today is perfect so far, good.
-    # Actually, simpler: calculate streak based on history strictly.
-    # But that's expensive.
-    # Let's do:
-    # If status is 'taken', check if all doses for TODAY (scheduled_time.date()) are taken.
-    # If yes, and we haven't updated streak for today yet, increment.
     
     log_date = instance.scheduled_time.date()
     
     # Check if we already updated streak for this date (optimization)
-    if profile.last_streak_date == log_date:
-        return # Already counted this day
+    # If we already counted this day, we stop.
+    if profile.last_streak_date != log_date:
+        # Get all scheduled meds for this patient
+        schedules = MedicationSchedule.objects.filter(patient=patient)
+        if schedules.exists():
+            # Count scheduled doses for this date (naive: assume daily frequency for all)
+            total_scheduled_today = schedules.filter(
+                Q(end_date__isnull=True) | Q(end_date__gte=log_date),
+                start_date__lte=log_date
+            ).count()
 
-    # Get all scheduled meds for this patient
-    schedules = MedicationSchedule.objects.filter(patient=patient)
-    if not schedules.exists():
-        return
+            # Count taken logs for this date
+            taken_logs_today = AdherenceLog.objects.filter(
+                patient=patient,
+                scheduled_time__date=log_date,
+                status='taken'
+            ).count()
 
-    # Count scheduled doses for this date (naive: assume daily frequency for all)
-    # Ideally logic needs to know which meds were scheduled for today.
-    # Assuming all active schedules are daily.
-    total_scheduled_today = schedules.filter(
-        Q(end_date__isnull=True) | Q(end_date__gte=log_date),
-        start_date__lte=log_date
-    ).count()
+            if taken_logs_today >= total_scheduled_today:
+                # Day complete!
+                # Check if yesterday was last streak date
+                yesterday = log_date - datetime.timedelta(days=1)
+                
+                if profile.last_streak_date == yesterday:
+                    profile.current_streak += 1
+                elif profile.last_streak_date == log_date:
+                    pass # Already done (caught by outer check)
+                else:
+                    # Broken streak or new streak?
+                    # If last streak was older than yesterday, reset to 1 (start of new streak)
+                    profile.current_streak = 1
+                
+                profile.last_streak_date = log_date
+                
+                if profile.current_streak > profile.longest_streak:
+                    profile.longest_streak = profile.current_streak
 
-    # Count taken logs for this date
-    taken_logs_today = AdherenceLog.objects.filter(
-        patient=patient,
-        scheduled_time__date=log_date,
-        status='taken'
-    ).count()
+    # SAVE PROFILE (Points + Streak changes)
+    profile.save()
 
-    if taken_logs_today >= total_scheduled_today:
-        # Day complete!
-        # Check if yesterday was last streak date
-        if profile.last_streak_date == log_date - datetime.timedelta(days=1):
-            profile.current_streak += 1
-        elif profile.last_streak_date == log_date:
-            pass # Already done
-        else:
-            # Broken streak or new streak?
-            # If last streak was yesterday, we incremented.
-            # If last streak was older, we reset to 1.
-            profile.current_streak = 1
-        
-        if profile.current_streak > profile.longest_streak:
-            profile.longest_streak = profile.current_streak
-            
 @receiver(post_save, sender=AdherenceLog)
 def update_inventory(sender, instance, created, **kwargs):
     """
