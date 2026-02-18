@@ -2,13 +2,23 @@ import { openDB } from "idb";
 import api from "./api";
 
 const DB_NAME = "art_companion_db";
-const STORE_NAME = "offline_logs";
+const STORES = {
+  LOGS: "offline_logs",
+  MESSAGES: "offline_messages",
+};
 
 export const initDB = async () => {
-  return openDB(DB_NAME, 1, {
+  return openDB(DB_NAME, 2, {
+    // Bump version
     upgrade(db) {
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, {
+      if (!db.objectStoreNames.contains(STORES.LOGS)) {
+        db.createObjectStore(STORES.LOGS, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+      if (!db.objectStoreNames.contains(STORES.MESSAGES)) {
+        db.createObjectStore(STORES.MESSAGES, {
           keyPath: "id",
           autoIncrement: true,
         });
@@ -17,34 +27,61 @@ export const initDB = async () => {
   });
 };
 
-export const saveOfflineLog = async (logData) => {
-  const db = await initDB();
-  await db.add(STORE_NAME, { ...logData, createdAt: new Date().toISOString() });
+export const saveOfflineItem = async (storeName, data) => {
+  try {
+    const db = await initDB();
+    await db.add(storeName, { ...data, createdAt: new Date().toISOString() });
+    return true;
+  } catch (err) {
+    console.error(`Failed to save to ${storeName}`, err);
+    return false;
+  }
 };
 
-export const syncOfflineLogs = async () => {
-  const db = await initDB();
-  const logs = await db.getAll(STORE_NAME);
+// Deprecated wrapper for backward compatibility if needed, or just replace usage
+export const saveOfflineLog = async (logData) => {
+  return saveOfflineItem(STORES.LOGS, logData);
+};
 
-  if (logs.length === 0) return;
+export const saveOfflineMessage = async (msgData) => {
+  return saveOfflineItem(STORES.MESSAGES, msgData);
+};
+
+export const syncOfflineData = async () => {
+  if (!navigator.onLine) return; // Don't try if offline
+
+  const db = await initDB();
+  const logs = await db.getAll(STORES.LOGS);
+  const messages = await db.getAll(STORES.MESSAGES);
+
+  if (logs.length === 0 && messages.length === 0) return;
 
   try {
-    // Prepare logs for backend (match backend expectation in SyncAdherenceView)
-    // Backend expects: list of objects with medication, scheduled_time, status, actual_time
     const payload = {
       logs: logs.map((log) => ({
         medication: log.medication,
-        scheduled_time: log.scheduled_time, // Ensure this matches backend format
+        scheduled_time: log.scheduled_time,
         status: log.status,
         actual_time: log.actual_time,
+      })),
+      messages: messages.map((msg) => ({
+        receiver_id: msg.receiver_id,
+        message: msg.message,
+        timestamp: msg.createdAt, // Backend might ignore this and use server time, but good to send
       })),
     };
 
     await api.post("sync/", payload);
 
     // Clear indexedDB after successful sync
-    await db.clear(STORE_NAME);
-    console.log("Offline logs synced successfully");
+    const tx = db.transaction([STORES.LOGS, STORES.MESSAGES], "readwrite");
+    await Promise.all([
+      tx.objectStore(STORES.LOGS).clear(),
+      tx.objectStore(STORES.MESSAGES).clear(),
+      tx.done,
+    ]);
+
+    console.log("Offline data synced successfully");
     return true;
   } catch (error) {
     console.error("Sync failed", error);
@@ -53,5 +90,5 @@ export const syncOfflineLogs = async () => {
 };
 
 // Auto-sync periodically or on online event
-window.addEventListener("online", syncOfflineLogs);
-setInterval(syncOfflineLogs, 60000); // Try every minute
+window.addEventListener("online", syncOfflineData);
+setInterval(syncOfflineData, 60000); // Try every minute

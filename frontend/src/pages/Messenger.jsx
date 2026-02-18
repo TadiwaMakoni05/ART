@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import api from "../services/api";
 import { useAuth } from "../context/useAuth";
+import { saveOfflineMessage } from "../services/offline";
 import { Send, Image, MoreVertical, Phone, X, ArrowLeft } from "lucide-react";
 
 const Messenger = () => {
@@ -163,6 +164,34 @@ const Messenger = () => {
       // Optimistic update or wait for poll
     } catch (error) {
       console.error("Error sending", error);
+      // Offline fallback (only for text messages for now, images are harder)
+      if (!image && newMessage.trim()) {
+        const offlineMsg = {
+          id: `temp-${Date.now()}`,
+          sender: user.user_id, // Store ID for consistency with backend expectation in some contexts, or full object if needed by UI
+          // But wait, the UI expects sender to be an object or ID.
+          // The sync logic needs `receiver_id` and `message`.
+
+          receiver_id: activeConversation.id,
+          message: newMessage,
+          timestamp: new Date().toISOString(),
+          is_read: false,
+          pending: true, // UI flag
+        };
+
+        await saveOfflineMessage(offlineMsg);
+
+        // Optimistically add to UI
+        // We need to shape it like the API response
+        const uiMsg = {
+          ...offlineMsg,
+          sender: user.user_id, // matching how we filter
+          receiver: activeConversation.id,
+        };
+
+        setAllMessages([...allMessages, uiMsg]);
+        setNewMessage("");
+      }
     }
   };
 

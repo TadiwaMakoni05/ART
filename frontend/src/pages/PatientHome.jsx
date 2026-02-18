@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import api from "../services/api";
 import { useAuth } from "../context/useAuth";
-import { saveOfflineLog } from "../services/offline";
+// import { saveOfflineLog } from "../services/offline";
 import {
   Check,
   X,
@@ -16,6 +16,7 @@ import {
   Trophy,
   BarChart2,
   Shield,
+  Volume2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -23,6 +24,7 @@ const PatientHome = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [medications, setMedications] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [gamification, setGamification] = useState({
@@ -36,21 +38,29 @@ const PatientHome = () => {
   const [quotes, setQuotes] = useState([]);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
 
+  // Audio for reminders
+  const audioRef = useRef(
+    new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch.ogg"),
+  );
+  const [lastNotifiedTime, setLastNotifiedTime] = useState(null);
+
   const fetchData = async () => {
     try {
-      const [medRes, logRes, gameRes, quoteRes] = await Promise.all([
+      const [medRes, logRes, gameRes, quoteRes, prescRes] = await Promise.all([
         api.get("medications/"),
         api.get("adherence/"),
         api
           .get("gamification/summary/")
           .catch(() => ({ data: { total_points: 0, current_streak: 0 } })),
         api.get("learn/home-quotes/").catch(() => ({ data: [] })),
+        api.get("prescriptions/").catch(() => ({ data: [] })),
       ]);
 
       setMedications(medRes.data);
       setLogs(logRes.data);
       setGamification(gameRes.data);
       setQuotes(quoteRes.data);
+      setPrescriptions(prescRes.data);
     } catch (error) {
       console.error("Error fetching patient data", error);
     } finally {
@@ -61,6 +71,67 @@ const PatientHome = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Poll for reminders every 10 seconds
+  useEffect(() => {
+    const checkReminders = () => {
+      const now = new Date();
+      const currentHM = now.toTimeString().slice(0, 5); // "HH:MM"
+
+      // Avoid double notification in the same minute
+      if (lastNotifiedTime === currentHM) return;
+
+      medications.forEach((med) => {
+        const medHM = med.scheduled_time.slice(0, 5);
+        if (medHM === currentHM) {
+          // Check if already taken today
+          const todayLog = logs.find(
+            (l) =>
+              l.medication === med.id &&
+              new Date(l.scheduled_time).toDateString() === now.toDateString(),
+          );
+
+          if (!todayLog || todayLog.status === "scheduled") {
+            // Play sound
+            audioRef.current
+              .play()
+              .catch((e) =>
+                console.log("Audio play failed (interaction needed):", e),
+              );
+
+            // Show Alert (Browser Notification or Toast)
+            if (
+              "Notification" in window &&
+              Notification.permission === "granted"
+            ) {
+              new Notification("Time to take your meds!", {
+                body: `It's time for ${med.medication_name}`,
+              });
+            } else if (
+              "Notification" in window &&
+              Notification.permission !== "denied"
+            ) {
+              Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                  new Notification("Time to take your meds!", {
+                    body: `It's time for ${med.medication_name}`,
+                  });
+                }
+              });
+            } else {
+              // Fallback to alert if notifications not supported/granted, but alerts block thread
+              // alert(`Time to take your medication: ${med.medication_name}`);
+            }
+
+            setLastNotifiedTime(currentHM);
+          }
+        }
+      });
+    };
+
+    const interval = setInterval(checkReminders, 10000); // Check every 10s
+    return () => clearInterval(interval);
+  }, [medications, logs, lastNotifiedTime]);
 
   // Rotate quotes every 30 seconds
   useEffect(() => {
@@ -110,6 +181,11 @@ const PatientHome = () => {
       if (status === "taken") {
         const gameRes = await api.get("gamification/summary/");
         setGamification(gameRes.data);
+
+        // Refresh prescriptions to update pill count
+        const prescRes = await api.get("prescriptions/");
+        setPrescriptions(prescRes.data);
+
         setShowAnimation(true);
         setTimeout(() => setShowAnimation(false), 2000);
       }
@@ -135,6 +211,17 @@ const PatientHome = () => {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Notification Request Button (Hidden if granted) */}
+          {"Notification" in window &&
+            Notification.permission !== "granted" && (
+              <button
+                onClick={() => Notification.requestPermission()}
+                className="text-neutral-400 hover:text-white"
+                title="Enable Notifications"
+              >
+                <Bell className="w-5 h-5" />
+              </button>
+            )}
           <button
             onClick={logout}
             className="text-sm text-neutral-400 hover:text-white"
@@ -242,27 +329,52 @@ const PatientHome = () => {
           </div>
         </div>
 
-        {/* Reminders - Compact */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20">
-            <div className="flex items-center gap-2 mb-2 text-blue-400">
-              <Clock className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">
-                Refill
-              </span>
+        {/* Reminders - Dynamic */}
+        {prescriptions.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4">
+            {/* Pill Count / Refill */}
+            <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20">
+              <div className="flex items-center gap-2 mb-2 text-blue-400">
+                <Clock className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  Details
+                </span>
+              </div>
+              <p className="text-lg font-bold">
+                {prescriptions[0].current_pills} Pills Left
+              </p>
+              <p className="text-xs text-neutral-400 mt-1">
+                {/* Naive refill calculation if not in backend yet */}
+                {prescriptions[0].total_pills > 0
+                  ? `${Math.round((prescriptions[0].current_pills / prescriptions[0].total_pills) * 100)}% remaining`
+                  : "0%"}
+              </p>
             </div>
-            <p className="text-lg font-bold">In 5 Days</p>
-          </div>
-          <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20">
-            <div className="flex items-center gap-2 mb-2 text-purple-400">
-              <Calendar className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">
-                Clinic
-              </span>
+
+            {/* Review Date */}
+            <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20">
+              <div className="flex items-center gap-2 mb-2 text-purple-400">
+                <Calendar className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  Review
+                </span>
+              </div>
+              <p className="text-lg font-bold">
+                {prescriptions[0].review_date
+                  ? new Date(prescriptions[0].review_date).toLocaleDateString(
+                      [],
+                      { month: "short", day: "numeric" },
+                    )
+                  : "Not set"}
+              </p>
+              <p className="text-xs text-neutral-400 mt-1">Next Check-up</p>
             </div>
-            <p className="text-lg font-bold">Oct 24</p>
           </div>
-        </div>
+        ) : (
+          <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20 text-neutral-500 text-sm">
+            No active prescriptions
+          </div>
+        )}
 
         {/* Medications List */}
         <div className="space-y-4">
@@ -281,7 +393,7 @@ const PatientHome = () => {
 
             const isTaken = todayLog?.status === "taken";
             const isMissed = todayLog?.status === "missed";
-            const isScheduled = !todayLog || todayLog?.status === "scheduled";
+            // const isScheduled = !todayLog || todayLog?.status === "scheduled";
 
             return (
               <div

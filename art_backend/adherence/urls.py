@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
 )
 from .views import (
     PatientViewSet, MedicationViewSet, AdherenceViewSet,
-    ProviderDashboardView, SyncAdherenceView, ChatbotView,
+    ProviderDashboardView, SyncDataView, ChatbotView,
     MyTokenObtainPairView, GamificationViewSet, QuoteView, AnalyticsView,
     AdminDashboardView, AdminUserViewSet, ProviderViewSet, MessageViewSet,
     PrescriptionViewSet
@@ -27,7 +27,7 @@ urlpatterns = [
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     path('providers/me/dashboard/', ProviderDashboardView.as_view(), name='provider-dashboard'),
-    path('sync/', SyncAdherenceView.as_view(), name='sync-adherence'),
+    path('sync/', SyncDataView.as_view(), name='sync-data'),
     path('chatbot/', ChatbotView.as_view(), name='chatbot'),
 
     path('learn/home-quotes/', QuoteView.as_view(), name='home-quotes'),

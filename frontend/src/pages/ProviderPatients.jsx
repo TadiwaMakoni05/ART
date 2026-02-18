@@ -40,7 +40,8 @@ const ProviderPatients = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-neutral-50 border-b border-neutral-200">
@@ -115,6 +116,59 @@ const ProviderPatients = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Grid */}
+      <div className="md:hidden grid grid-cols-1 gap-4">
+        {patients.map((patient) => (
+          <div
+            key={patient.id}
+            className="bg-white p-4 rounded-xl shadow-sm border border-neutral-200 space-y-3"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-bold text-neutral-900">
+                  {patient.full_name}
+                </h3>
+                <p className="text-sm text-neutral-500">
+                  {patient.clinic_id || "No ID"}
+                </p>
+              </div>
+              <AdherenceBadge score={patient.adherence_score} />
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-neutral-600">
+              <Phone className="w-4 h-4" />
+              {patient.phone}
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-neutral-100">
+              <a
+                href={`tel:${patient.phone}`}
+                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50 rounded-lg hover:bg-neutral-100"
+              >
+                Call
+              </a>
+              <button
+                onClick={() => navigate("/provider/messages")}
+                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50 rounded-lg hover:bg-neutral-100"
+              >
+                Message
+              </button>
+              <button
+                onClick={() => navigate(`/provider/patients/${patient.id}`)}
+                className="flex-1 py-2 text-center text-sm font-medium text-white bg-black rounded-lg hover:bg-neutral-800"
+              >
+                View
+              </button>
+            </div>
+          </div>
+        ))}
+        {patients.length === 0 && (
+          <div className="text-center text-neutral-500 py-8">
+            No patients found.
+          </div>
+        )}
       </div>
     </div>
   );

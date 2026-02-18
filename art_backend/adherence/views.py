@@ -21,21 +21,45 @@ class QuoteView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        mode = request.query_params.get('mode', 'random')
+        mode = request.query_params.get('mode', 'daily')
         
         if mode == 'all':
             quotes = Quote.objects.all()
             serializer = QuoteSerializer(quotes, many=True)
             return Response(serializer.data)
 
-        # Randomly select 3 quotes
         count = Quote.objects.count()
         if count == 0:
             return Response([])
+
+        # Deterministic Daily Quote
+        # Use date as seed
+        today = timezone.now().date()
+        seed = int(today.strftime('%Y%m%d'))
+        random.seed(seed)
         
-        # Inefficient for large tables, but fine for MVP
-        random_quotes = Quote.objects.order_by('?')[:3]
-        serializer = QuoteSerializer(random_quotes, many=True)
+        # Select 3 quotes deterministically for the day
+        # We can't use order_by('?') with seed in DB easily.
+        # Fetch all IDs, pick 3 based on seed.
+        all_ids = list(Quote.objects.values_list('id', flat=True))
+        selected_ids = []
+        if len(all_ids) <= 3:
+            selected_ids = all_ids
+        else:
+            selected_ids = random.sample(all_ids, 3)
+            
+        # Reset seed (good practice though random is module level, might affect others if threaded? 
+        # Actually random.seed() affects global state. 
+        # Better to instantiate a Random object if possible, but for MVP global seed reset is unlikely to break much 
+        # OR just use random.Random(seed).sample)
+        rng = random.Random(seed)
+        if len(all_ids) > 3:
+             selected_ids = rng.sample(all_ids, 3)
+        else:
+             selected_ids = all_ids
+
+        daily_quotes = Quote.objects.filter(id__in=selected_ids)
+        serializer = QuoteSerializer(daily_quotes, many=True)
         return Response(serializer.data)
 
 class AnalyticsView(views.APIView):
@@ -262,11 +286,36 @@ class AdherenceViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = AdherenceLog.objects.none()
 
+        # Date filtering
+        start_date_str = self.request.query_params.get('start_date')
+        end_date_str = self.request.query_params.get('end_date')
+        
         if user.role == 'patient':
-            # Lazy generation for today
+            # Lazy generation for requested range or today
             try:
                 from .utils import generate_daily_doses
-                generate_daily_doses(user.patient_profile)
+                today = timezone.now().date()
+                
+                # Determine dates to generate
+                dates_to_generate = [today]
+                
+                if start_date_str:
+                    start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
+                    if start_date != today:
+                        dates_to_generate = [start_date]
+                        # If end_date provided, handle range? 
+                        # For now, frontend usually requests specific days or small ranges.
+                        # Let's generate for start_date.
+                        if end_date_str:
+                             end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+                             # Simple loop for range (cap at 7 days to prevent abuse)
+                             delta = (end_date - start_date).days
+                             if 0 < delta <= 7:
+                                 dates_to_generate = [start_date + datetime.timedelta(days=i) for i in range(delta + 1)]
+
+                for d in dates_to_generate:
+                    generate_daily_doses(user.patient_profile, target_date=d)
+                    
             except Exception as e:
                 print(f"Error generating doses: {e}")
 
@@ -276,14 +325,10 @@ class AdherenceViewSet(viewsets.ModelViewSet):
             if patient_id:
                  queryset = AdherenceLog.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
         
-        # Date filtering
-        start_date = self.request.query_params.get('start_date')
-        end_date = self.request.query_params.get('end_date')
-        
-        if start_date:
-            queryset = queryset.filter(scheduled_time__date__gte=start_date)
-        if end_date:
-            queryset = queryset.filter(scheduled_time__date__lte=end_date)
+        if start_date_str:
+            queryset = queryset.filter(scheduled_time__date__gte=start_date_str)
+        if end_date_str:
+            queryset = queryset.filter(scheduled_time__date__lte=end_date_str)
             
         return queryset
 
@@ -373,41 +418,62 @@ class ProviderDashboardView(views.APIView):
         }
         return Response(data)
 
-class SyncAdherenceView(views.APIView):
-    permission_classes = [IsPatient]
+class SyncDataView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request):
         user = request.user
-        # Expect a list of logs
-        logs = request.data.get('logs', [])
-        created_count = 0
+        data = request.data
         
-        for log_data in logs:
-            # Check duplication
-            # Assuming log_data contains medication_id, scheduled_time, status, actual_time
-            # and medication_id refers to MedicationSchedule ID
-            # patient is user.patient_profile
-            
-            medication_id = log_data.get('medication')
-            scheduled_time = log_data.get('scheduled_time')
-            
-            exists = AdherenceLog.objects.filter(
-                patient=user.patient_profile,
-                medication_id=medication_id,
-                scheduled_time=scheduled_time
-            ).exists()
-            
-            if not exists:
-                AdherenceLog.objects.create(
+        logs = data.get('logs', [])
+        messages = data.get('messages', [])
+        
+        synced_counts = {'logs': 0, 'messages': 0}
+        
+        # 1. Process Logs (Only for Patients)
+        if user.role == 'patient' and logs:
+            for log_data in logs:
+                medication_id = log_data.get('medication')
+                scheduled_time = log_data.get('scheduled_time')
+                
+                exists = AdherenceLog.objects.filter(
                     patient=user.patient_profile,
                     medication_id=medication_id,
-                    scheduled_time=scheduled_time,
-                    actual_time=log_data.get('actual_time'),
-                    status=log_data.get('status')
-                )
-                created_count += 1
+                    scheduled_time=scheduled_time
+                ).exists()
                 
-        return Response({"synced": created_count}, status=status.HTTP_200_OK)
+                if not exists:
+                    try:
+                        AdherenceLog.objects.create(
+                            patient=user.patient_profile,
+                            medication_id=medication_id,
+                            scheduled_time=scheduled_time,
+                            actual_time=log_data.get('actual_time'),
+                            status=log_data.get('status')
+                        )
+                        synced_counts['logs'] += 1
+                    except Exception as e:
+                        print(f"Error syncing log: {e}")
+
+        # 2. Process Messages (All Authenticated Users)
+        if messages:
+            for msg_data in messages:
+                receiver_id = msg_data.get('receiver_id')
+                content = msg_data.get('message')
+                
+                if receiver_id and content:
+                    try:
+                        CounselingMessage.objects.create(
+                            sender=user,
+                            receiver_id=receiver_id,
+                            message=content,
+                            # timestamp handles itself (auto_now_add)
+                        )
+                        synced_counts['messages'] += 1
+                    except Exception as e:
+                        print(f"Error syncing message: {e}")
+                
+        return Response({"synced": synced_counts}, status=status.HTTP_200_OK)
 
 class ChatbotView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
