@@ -23,10 +23,13 @@ import Learn from "./pages/Learn";
 import Rewards from "./pages/Rewards";
 import PatientAnalytics from "./pages/PatientAnalytics";
 import PatientHistory from "./pages/PatientHistory";
+import PatientLayout from "./components/PatientLayout";
 // import PatientDetail from "./pages/PatientDetail"; // Seemed unused or TBD
 
 // Shared Pages
 import Messenger from "./pages/Messenger";
+import Settings from "./pages/Settings";
+import LandingPage from "./pages/LandingPage";
 
 // Admin Pages
 import AdminLayout from "./components/AdminLayout";
@@ -55,7 +58,9 @@ function App() {
               <Route path="patients" element={<ProviderPatients />} />
               <Route path="patients/new" element={<CreatePatient />} />
               <Route path="patients/:id" element={<PatientDetail />} />
+              <Route path="patients/:id" element={<PatientDetail />} />
               <Route path="messages" element={<Messenger />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Patient Routes */}
@@ -63,42 +68,17 @@ function App() {
               path="/patient"
               element={
                 <ProtectedRoute allowedRoles={["patient"]}>
-                  <PatientHome />
+                  <PatientLayout />
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/patient/learn"
-              element={
-                <ProtectedRoute allowedRoles={["patient"]}>
-                  <Learn />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/patient/history"
-              element={
-                <ProtectedRoute allowedRoles={["patient"]}>
-                  <PatientHistory />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/patient/rewards"
-              element={
-                <ProtectedRoute allowedRoles={["patient"]}>
-                  <Rewards />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/patient/analytics"
-              element={
-                <ProtectedRoute allowedRoles={["patient"]}>
-                  <PatientAnalytics />
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route index element={<PatientHome />} />
+              <Route path="learn" element={<Learn />} />
+              <Route path="history" element={<PatientHistory />} />
+              <Route path="rewards" element={<Rewards />} />
+              <Route path="analytics" element={<PatientAnalytics />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
 
             {/* Shared Routes (if accessed directly, but ideally via layout) */}
             <Route
@@ -126,14 +106,11 @@ function App() {
                 path="providers"
                 element={<AdminUsers role="provider" />}
               />
-              <Route
-                path="settings"
-                element={<div>Settings Component TBD</div>}
-              />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Default Redirect */}
-            <Route path="/" element={<RootRedirect />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

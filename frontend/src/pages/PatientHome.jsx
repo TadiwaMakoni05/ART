@@ -8,21 +8,13 @@ import {
   Bell,
   Award,
   Calendar,
-  MessageSquare,
-  BookOpen,
-  Home,
   Clock,
   Zap,
   Trophy,
-  BarChart2,
-  Shield,
-  Volume2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const PatientHome = () => {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [medications, setMedications] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
   const [logs, setLogs] = useState([]);
@@ -201,286 +193,240 @@ const PatientHome = () => {
     return <div className="p-8 text-center animate-pulse">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white pb-24">
-      <nav className="border-b border-neutral-800 px-4 py-4 flex justify-between items-center sticky top-0 z-10 bg-neutral-900/80 backdrop-blur">
-        <div className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-white" />
-          <h1 className="text-xl font-bold tracking-tight text-white">
-            ART Companion
-          </h1>
-          <p className="text-sm text-white mx-12">Welcome back,<b> {user?.full_name.toUpperCase() || user?.username.toUpperCase()}</b>!</p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* Notification Request Button (Hidden if granted) */}
-          {"Notification" in window &&
-            Notification.permission !== "granted" && (
-              <button
-                onClick={() => Notification.requestPermission()}
-                className="text-neutral-400 hover:text-white"
-                title="Enable Notifications"
-              >
-                <Bell className="w-5 h-5" />
-              </button>
-            )}
-          <button
-            onClick={logout}
-            className="text-sm text-neutral-400 hover:text-white"
-          >
-            Logout
-          </button>
-          <div className="w-8 h-8 bg-neutral-800  flex items-center justify-center">
-            <span className="text-xs font-bold">
-              {(user?.full_name || user?.username)?.[0].toUpperCase()}
-            </span>
-          </div>
-        </div>
-      </nav>
-
-      <main className="p-4 max-w-lg mx-auto space-y-6">
-        {/* Gamification Header Widget */}
-        <div className="bg-gradient-to-br bg-white   p-6 ring-1 ring-black relative overflow-hidden">
-          {showAnimation && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20 animate-in fade-in zoom-in duration-300">
-              <div className="text-center">
-                <Trophy className="w-16 h-16 text-yellow-400 mx-auto animate-bounce" />
-                <p className="text-2xl font-bold text-yellow-400 mt-2">
-                  + Points!
-                </p>
-              </div>
-            </div>
-          )}
-          <div className="flex justify-between items-start relative z-10">
-            <div>
-              <p className="text-black text-sm font-medium mb-1">
-                Current Streak
-              </p>
-              <div className="flex items-baseline gap-2">
-                <h2 className="text-4xl font-bold text-black flex items-center gap-2">
-                  {gamification.current_streak}{" "}
-                  <Zap className="w-6 h-6 text-yellow-500 fill-yellow-500" />
-                </h2>
-                <span className="text-sm text-black">days</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-black text-sm font-medium mb-1">
-                Total Points
-              </p>
-              <div className="text-2xl font-bold text-black flex items-center justify-end gap-2">
-                {gamification.total_points}{" "}
-                <Award className="w-5 h-5 text-purple-400" />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <div className="flex justify-between text-xs text-black mb-2">
-              <span className="text-black">Weekly Progress</span>
-              <span>
-                {gamification.current_streak > 0 ? "On Fire!" : "Keep going!"}
-              </span>
-            </div>
-            <div className="h-3 bg-neutral-800  overflow-hidden">
-              {/* Mock progress based on streak or logs, ideally calculated from weekly adherence */}
-              <div
-                className="h-full bg-indigo-500 transition-all duration-1000 ease-out"
-                style={{
-                  width: `${Math.min(gamification.current_streak * 10, 100)}%`,
-                }}
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Motivation Widget */}
-        <div className="bg-neutral-800  p-6 ring-1 ring-white/10 relative overflow-hidden min-h-[160px] flex flex-col justify-center">
-          {quotes.length > 0 ? (
-            <div className="animate-in fade-in slide-in-from-right duration-700 key={currentQuoteIndex}">
-              <p className="text-xl font-light italic text-neutral-300 mb-4">
-                "{quotes[currentQuoteIndex].text}"
-              </p>
-              <div className="flex justify-between items-center text-xs text-neutral-500 uppercase tracking-wider">
-                <span>{quotes[currentQuoteIndex].author || "Unknown"}</span>
-                <span
-                  className={`px-2 py-1  bg-white/5 ${
-                    quotes[currentQuoteIndex].category === "spiritual"
-                      ? "text-blue-400"
-                      : quotes[currentQuoteIndex].category === "mental"
-                        ? "text-purple-400"
-                        : "text-green-400"
-                  }`}
-                >
-                  {quotes[currentQuoteIndex].category}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center text-neutral-500">
-              <p>Loading inspiration...</p>
-            </div>
-          )}
-          {/* Simple progress bar for timer */}
-          <div className="absolute bottom-0 left-0 h-1 bg-white/10 w-full">
-            <div
-              key={currentQuoteIndex}
-              className="h-full bg-white/30 animate-[progress_30s_linear]"
-              style={{ animationDuration: "30s" }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Reminders - Dynamic */}
-        {prescriptions.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
-            {/* Pill Count / Refill */}
-            <div className="bg-neutral-800 p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
-              <div className="flex items-center gap-2 mb-2 text-blue-400">
-                <Clock className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase tracking-wider">
-                  Details
-                </span>
-              </div>
-              <p className="text-lg font-bold">
-                {prescriptions[0].current_pills} Pills Left
-              </p>
-              <p className="text-xs text-neutral-400 mt-1">
-                {/* Naive refill calculation if not in backend yet */}
-                {prescriptions[0].total_pills > 0
-                  ? `${Math.round((prescriptions[0].current_pills / prescriptions[0].total_pills) * 100)}% remaining`
-                  : "0%"}
-              </p>
-            </div>
-
-            {/* Review Date */}
-            <div className="bg-neutral-800 p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
-              <div className="flex items-center gap-2 mb-2 text-purple-400">
-                <Calendar className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase tracking-wider">
-                  Review
-                </span>
-              </div>
-              <p className="text-lg font-bold">
-                {prescriptions[0].review_date
-                  ? new Date(prescriptions[0].review_date).toLocaleDateString(
-                      [],
-                      { month: "short", day: "numeric" },
-                    )
-                  : "Not set"}
-              </p>
-              <p className="text-xs text-neutral-400 mt-1">Next Check-up</p>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-neutral-800 p-4  ring-1 ring-white/5 shadow-lg shadow-black/20 text-neutral-500 text-sm">
-            No active prescriptions
-          </div>
-        )}
-
-        {/* Medications List */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Bell className="w-4 h-4" /> Upcoming Doses
-          </h3>
-
-          {medications.map((med) => {
-            // Find today's log for this medication
-            const todayLog = logs.find(
-              (l) =>
-                l.medication === med.id &&
-                new Date(l.scheduled_time).toDateString() ===
-                  new Date().toDateString(),
-            );
-
-            const isTaken = todayLog?.status === "taken";
-            const isMissed = todayLog?.status === "missed";
-            // const isScheduled = !todayLog || todayLog?.status === "scheduled";
-
-            return (
-              <div
-                key={med.id}
-                className="bg-neutral-800  p-5 ring-1 ring-white/5 flex justify-between items-center shadow-lg shadow-black/20"
-              >
+    <div className="space-y-6">
+      <header className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-neutral-900">
+          Patient Dashboard
+        </h1>
+        <p className="text-neutral-500">
+          Welcome back, {user?.full_name || user?.username}
+        </p>
+      </header>
+      <main className="p-4 w-full mx-auto space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Left Column: Stats & Motivation */}
+          <div className="space-y-6 lg:col-span-1">
+            {/* Gamification Header Widget */}
+            <div className="bg-gradient-to-br bg-white   p-6 ring-1 ring-black relative overflow-hidden">
+              {showAnimation && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20 animate-in fade-in zoom-in duration-300">
+                  <div className="text-center">
+                    <Trophy className="w-16 h-16 text-yellow-400 mx-auto animate-bounce" />
+                    <p className="text-2xl font-bold text-yellow-400 mt-2">
+                      + Points!
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="flex justify-between items-start relative z-10">
                 <div>
-                  <h4 className="font-semibold text-lg">
-                    {med.medication_name}
-                  </h4>
-                  <p className="text-neutral-400 text-sm">
-                    {med.dosage} • {med.scheduled_time}
+                  <p className="text-black text-sm font-medium mb-1">
+                    Current Streak
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <h2 className="text-4xl font-bold text-black flex items-center gap-2">
+                      {gamification.current_streak}{" "}
+                      <Zap className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+                    </h2>
+                    <span className="text-sm text-black">days</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-black text-sm font-medium mb-1">
+                    Total Points
+                  </p>
+                  <div className="text-2xl font-bold text-black flex items-center justify-end gap-2">
+                    {gamification.total_points}{" "}
+                    <Award className="w-5 h-5 text-purple-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="flex justify-between text-xs text-black mb-2">
+                  <span className="text-black">Weekly Progress</span>
+                  <span>
+                    {gamification.current_streak > 0
+                      ? "On Fire!"
+                      : "Keep going!"}
+                  </span>
+                </div>
+                <div className="h-3 bg-neutral-800  overflow-hidden">
+                  {/* Mock progress based on streak or logs, ideally calculated from weekly adherence */}
+                  <div
+                    className="h-full bg-indigo-500 transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${Math.min(gamification.current_streak * 10, 100)}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Motivation Widget */}
+            <div className="bg-white p-6 ring-1 ring-white/10 relative overflow-hidden min-h-[160px] flex flex-col justify-center">
+              {quotes.length > 0 ? (
+                <div className="animate-in fade-in slide-in-from-right duration-700 key={currentQuoteIndex}">
+                  <p className="text-xl font-light italic text-black mb-4">
+                    "{quotes[currentQuoteIndex].text}"
+                  </p>
+                  <div className="flex justify-between items-center text-xs text-neutral-500 uppercase tracking-wider">
+                    <span>{quotes[currentQuoteIndex].author || "Unknown"}</span>
+                    <span
+                      className={`px-2 py-1  bg-white/5 ${
+                        quotes[currentQuoteIndex].category === "spiritual"
+                          ? "text-blue-400"
+                          : quotes[currentQuoteIndex].category === "mental"
+                            ? "text-purple-400"
+                            : "text-green-400"
+                      }`}
+                    >
+                      {quotes[currentQuoteIndex].category}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center text-neutral-500">
+                  <p>Loading inspiration...</p>
+                </div>
+              )}
+              {/* Simple progress bar for timer */}
+              <div className="absolute bottom-0 left-0 h-1 bg-white/10 w-full">
+                <div
+                  key={currentQuoteIndex}
+                  className="h-full bg-white/30 animate-[progress_30s_linear]"
+                  style={{ animationDuration: "30s" }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Center/Right Column: Meds & Prescription Details */}
+          <div className="space-y-6 lg:col-span-2">
+            {/* Reminders - Dynamic */}
+            {prescriptions.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                {/* Pill Count / Refill */}
+                <div className="bg-white p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
+                  <div className="flex items-center gap-2 mb-2 text-blue-400">
+                    <Clock className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      Details
+                    </span>
+                  </div>
+                  <p className="text-lg font-bold">
+                    {prescriptions[0].current_pills} Pills Left
+                  </p>
+                  <p className="text-xs text-neutral-400 mt-1">
+                    {/* Naive refill calculation if not in backend yet */}
+                    {prescriptions[0].total_pills > 0
+                      ? `${Math.round((prescriptions[0].current_pills / prescriptions[0].total_pills) * 100)}% remaining`
+                      : "0%"}
                   </p>
                 </div>
 
-                {isTaken ? (
-                  <div className="flex items-center gap-2 text-green-400 bg-green-400/10 px-3 py-1  text-sm font-medium">
-                    <Check className="w-4 h-4" /> Taken
+                {/* Review Date */}
+                <div className="bg-white p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
+                  <div className="flex items-center gap-2 mb-2 text-purple-400">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      Review
+                    </span>
                   </div>
-                ) : isMissed ? (
-                  <div className="flex items-center gap-2 text-red-400 bg-red-400/10 px-3 py-1  text-sm font-medium">
-                    <X className="w-4 h-4" /> Missed
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleLog(med, "taken", todayLog)}
-                      className="bg-white text-black p-2  hover:bg-neutral-200 transition"
-                      title="Mark as Taken"
-                    >
-                      <Check className="w-6 h-6" />
-                    </button>
-                    <button
-                      onClick={() => handleLog(med, "missed", todayLog)}
-                      className="bg-neutral-800 text-neutral-400 p-2  ring-1 ring-neutral-700 hover:bg-neutral-700 transition"
-                      title="Mark as Missed"
-                    >
-                      <X className="w-6 h-6" />
-                    </button>
-                  </div>
-                )}
+                  <p className="text-lg font-bold">
+                    {prescriptions[0].review_date
+                      ? new Date(
+                          prescriptions[0].review_date,
+                        ).toLocaleDateString([], {
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "Not set"}
+                  </p>
+                  <p className="text-xs text-neutral-400 mt-1">Next Check-up</p>
+                </div>
               </div>
-            );
-          })}
+            ) : (
+              <div className="bg-white p-4  ring-1 ring-white/5 shadow-lg shadow-black/20 text-neutral-500 text-sm">
+                No active prescriptions
+              </div>
+            )}
 
-          {medications.length === 0 && (
-            <p className="text-neutral-500 text-center py-8">
-              No medications scheduled.
-            </p>
-          )}
+            {/* Medications List */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Bell className="w-4 h-4" /> Upcoming Doses
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {medications.map((med) => {
+                  // Find today's log for this medication
+                  const todayLog = logs.find(
+                    (l) =>
+                      l.medication === med.id &&
+                      new Date(l.scheduled_time).toDateString() ===
+                        new Date().toDateString(),
+                  );
+
+                  const isTaken = todayLog?.status === "taken";
+                  const isMissed = todayLog?.status === "missed";
+
+                  return (
+                    <div
+                      key={med.id}
+                      className="bg-white  p-5 ring-1 ring-white/5 flex justify-between items-center shadow-lg shadow-black/20"
+                    >
+                      <div>
+                        <h4 className="font-semibold text-lg">
+                          {med.medication_name}
+                        </h4>
+                        <p className="text-neutral-400 text-sm">
+                          {med.dosage} • {med.scheduled_time}
+                        </p>
+                      </div>
+
+                      {isTaken ? (
+                        <div className="flex items-center gap-2 text-green-400 bg-green-400/10 px-3 py-1  text-sm font-medium">
+                          <Check className="w-4 h-4" /> Taken
+                        </div>
+                      ) : isMissed ? (
+                        <div className="flex items-center gap-2 text-red-400 bg-red-400/10 px-3 py-1  text-sm font-medium">
+                          <X className="w-4 h-4" /> Missed
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleLog(med, "taken", todayLog)}
+                            className="bg-white text-black p-2  hover:bg-neutral-200 transition"
+                            title="Mark as Taken"
+                          >
+                            <Check className="w-6 h-6" />
+                          </button>
+                          <button
+                            onClick={() => handleLog(med, "missed", todayLog)}
+                            className="bg-white text-neutral-400 p-2  ring-1 ring-neutral-700 hover:bg-neutral-700 transition"
+                            title="Mark as Missed"
+                          >
+                            <X className="w-6 h-6" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {medications.length === 0 && (
+                <p className="text-neutral-500 text-center py-8">
+                  No medications scheduled.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 p-4 flex justify-around z-20 pb-safe">
-        <button
-          onClick={() => navigate("/patient")}
-          className="text-white flex flex-col items-center text-[10px] gap-1 transition"
-        >
-          <Home className="w-6 h-6" /> Home
-        </button>
-        <button
-          onClick={() => navigate("/patient/rewards")}
-          className="text-neutral-500 hover:text-white flex flex-col items-center text-[10px] gap-1 transition"
-        >
-          <Trophy className="w-6 h-6" /> Rewards
-        </button>
-        <button
-          onClick={() => navigate("/patient/analytics")}
-          className="text-neutral-500 hover:text-white flex flex-col items-center text-[10px] gap-1 transition"
-        >
-          <BarChart2 className="w-6 h-6" /> Analytics
-        </button>
-        <button
-          onClick={() => navigate("/messages")}
-          className="text-neutral-500 hover:text-white flex flex-col items-center text-[10px] gap-1 transition"
-        >
-          <MessageSquare className="w-6 h-6" /> Chat
-        </button>
-        <button
-          onClick={() => navigate("/patient/learn")}
-          className="text-neutral-500 hover:text-white flex flex-col items-center text-[10px] gap-1 transition"
-        >
-          <BookOpen className="w-6 h-6" /> Learn
-        </button>
-      </nav>
     </div>
   );
 };

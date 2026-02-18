@@ -41,7 +41,7 @@ const ProviderPatients = () => {
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block bg-white  shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="hidden lg:block bg-white  shadow-sm border border-neutral-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-neutral-50 border-b border-neutral-200">
@@ -119,7 +119,7 @@ const ProviderPatients = () => {
       </div>
 
       {/* Mobile Grid */}
-      <div className="md:hidden grid grid-cols-1 gap-4">
+      <div className="lg:hidden grid grid-cols-1 gap-4">
         {patients.map((patient) => (
           <div
             key={patient.id}

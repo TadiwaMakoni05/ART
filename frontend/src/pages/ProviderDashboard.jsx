@@ -81,7 +81,7 @@ const ProviderDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatCard
           title="Total Patients"
           value={stats?.total_patients}
@@ -106,7 +106,7 @@ const ProviderDashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Adherence Chart */}
         <div className="bg-white p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-semibold mb-4">Adherence Rate</h3>

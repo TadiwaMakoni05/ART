@@ -104,7 +104,7 @@ const AdminDashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Adherence Chart */}
         <div className="bg-white p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-bold mb-4">System Adherence</h3>

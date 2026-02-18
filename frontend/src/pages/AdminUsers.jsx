@@ -138,7 +138,7 @@ const AdminUsers = ({ role }) => {
         />
       </div>
 
-      <div className="bg-white  shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="hidden lg:block bg-white  shadow-sm border border-neutral-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-neutral-50 border-b border-neutral-200">
@@ -204,6 +204,54 @@ const AdminUsers = ({ role }) => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Grid */}
+      <div className="lg:hidden grid grid-cols-1 gap-4">
+        {filteredUsers.map((user) => (
+          <div
+            key={user.id}
+            className="bg-white p-4 shadow-sm border border-neutral-200 space-y-3"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-bold text-neutral-900">{user.username}</h3>
+                <p className="text-sm text-neutral-500">
+                  Created: {new Date(user.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <span
+                className={`px-2 py-1 text-xs font-medium ${
+                  user.is_active
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {user.is_active ? "Active" : "Inactive"}
+              </span>
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-neutral-100">
+              <button
+                onClick={() => openEdit(user)}
+                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50 hover:bg-neutral-100"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(user.id)}
+                className="flex-1 py-2 text-center text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+        {filteredUsers.length === 0 && (
+          <div className="text-center text-neutral-500 py-8">
+            No users found.
+          </div>
+        )}
       </div>
 
       {/* Modal */}

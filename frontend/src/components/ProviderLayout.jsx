@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   Shield,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 
@@ -37,13 +38,18 @@ const ProviderLayout = () => {
       label: "Messages",
       icon: <MessageSquare size={20} />,
     },
+    {
+      path: "/provider/settings",
+      label: "Settings",
+      icon: <Settings size={20} />,
+    },
   ];
 
   return (
     <div className="min-h-screen bg-neutral-100 flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-neutral-200 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-neutral-200 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -54,7 +60,7 @@ const ProviderLayout = () => {
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden text-neutral-400 hover:text-black"
+            className="lg:hidden text-neutral-400 hover:text-black"
           >
             <X size={24} />
           </button>
@@ -107,7 +113,7 @@ const ProviderLayout = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile Header */}
-        <header className="md:hidden bg-white border-b border-neutral-200 p-4 flex items-center justify-between">
+        <header className="lg:hidden bg-white border-b border-neutral-200 p-4 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-lg">
             <Shield className="text-black w-5 h-5" />
             <span>Provider Portal</span>
@@ -128,7 +134,7 @@ const ProviderLayout = () => {
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
