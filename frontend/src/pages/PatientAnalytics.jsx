@@ -78,7 +78,7 @@ const PatientAnalytics = () => {
       <div className="bg-white p-6 border-b border-neutral-200 sticky top-0 z-10 flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-neutral-100 rounded-full"
+          className="p-2 hover:bg-neutral-100 "
         >
           <ChevronRight className="w-6 h-6 rotate-180" />
         </button>
@@ -88,17 +88,17 @@ const PatientAnalytics = () => {
       <main className="p-4 max-w-lg mx-auto space-y-6">
         {/* Stats Summary */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-white p-3 rounded-xl border border-neutral-100 shadow-sm text-center">
+          <div className="bg-white p-3  border border-neutral-100 shadow-sm text-center">
             <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{data.totals.taken}</p>
             <p className="text-xs text-neutral-500">Taken</p>
           </div>
-          <div className="bg-white p-3 rounded-xl border border-neutral-100 shadow-sm text-center">
+          <div className="bg-white p-3  border border-neutral-100 shadow-sm text-center">
             <XCircle className="w-6 h-6 text-red-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{data.totals.missed}</p>
             <p className="text-xs text-neutral-500">Missed</p>
           </div>
-          <div className="bg-white p-3 rounded-xl border border-neutral-100 shadow-sm text-center">
+          <div className="bg-white p-3  border border-neutral-100 shadow-sm text-center">
             <Clock className="w-6 h-6 text-blue-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{data.totals.snoozed}</p>
             <p className="text-xs text-neutral-500">Snoozed</p>
@@ -106,7 +106,7 @@ const PatientAnalytics = () => {
         </div>
 
         {/* Daily Trend Chart */}
-        <div className="bg-white p-5 rounded-xl border border-neutral-100 shadow-sm">
+        <div className="bg-white p-5  border border-neutral-100 shadow-sm">
           <h3 className="font-bold flex items-center gap-2 mb-4">
             <BarChart2 className="w-5 h-5 text-indigo-500" /> Daily Adherence
             (Last 7 Days)
@@ -153,7 +153,7 @@ const PatientAnalytics = () => {
         </div>
 
         {/* Weekly Trend Chart */}
-        <div className="bg-white p-5 rounded-xl border border-neutral-100 shadow-sm">
+        <div className="bg-white p-5  border border-neutral-100 shadow-sm">
           <h3 className="font-bold flex items-center gap-2 mb-4">
             <TrendingUp className="w-5 h-5 text-purple-500" /> Weekly Adherence
             %

@@ -120,14 +120,14 @@ const AdminUsers = ({ role }) => {
         <h1 className="text-2xl font-bold capitalize">{role}s Management</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-neutral-800 transition"
+          className="bg-black text-white px-4 py-2  flex items-center gap-2 hover:bg-neutral-800 transition"
         >
           <Plus size={18} />
           Add {role}
         </button>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-neutral-200 flex items-center gap-3">
+      <div className="bg-white p-4  shadow-sm border border-neutral-200 flex items-center gap-3">
         <Search className="text-neutral-400" size={20} />
         <input
           type="text"
@@ -138,7 +138,7 @@ const AdminUsers = ({ role }) => {
         />
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="bg-white  shadow-sm border border-neutral-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-neutral-50 border-b border-neutral-200">
@@ -165,7 +165,7 @@ const AdminUsers = ({ role }) => {
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${user.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                      className={`px-2 py-1  text-xs font-medium ${user.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
                     >
                       {user.is_active ? "Active" : "Inactive"}
                     </span>
@@ -176,14 +176,14 @@ const AdminUsers = ({ role }) => {
                   <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                     <button
                       onClick={() => openEdit(user)}
-                      className="p-2 text-neutral-500 hover:text-blue-600 bg-neutral-100 rounded-full transition"
+                      className="p-2 text-neutral-500 hover:text-blue-600 bg-neutral-100  transition"
                       title="Edit"
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(user.id)}
-                      className="p-2 text-neutral-500 hover:text-red-600 bg-neutral-100 rounded-full transition"
+                      className="p-2 text-neutral-500 hover:text-red-600 bg-neutral-100  transition"
                       title="Delete"
                     >
                       <Trash2 size={16} />
@@ -209,7 +209,7 @@ const AdminUsers = ({ role }) => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white  shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">
                 {currentUser ? "Edit" : "Add"} {role}
@@ -233,7 +233,7 @@ const AdminUsers = ({ role }) => {
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
                   }
-                  className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                  className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                   required
                 />
               </div>
@@ -249,7 +249,7 @@ const AdminUsers = ({ role }) => {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                    className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                     required={!currentUser}
                   />
                 </div>
@@ -267,7 +267,7 @@ const AdminUsers = ({ role }) => {
                       setFormData({ ...formData, password: e.target.value })
                     }
                     placeholder="Leave blank to keep current"
-                    className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                    className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                   />
                 </div>
               )}
@@ -284,7 +284,7 @@ const AdminUsers = ({ role }) => {
                       onChange={(e) =>
                         setFormData({ ...formData, full_name: e.target.value })
                       }
-                      className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                      className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                     />
                   </div>
                   <div>
@@ -297,7 +297,7 @@ const AdminUsers = ({ role }) => {
                       onChange={(e) =>
                         setFormData({ ...formData, phone: e.target.value })
                       }
-                      className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                      className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                     />
                   </div>
                   <div>
@@ -310,7 +310,7 @@ const AdminUsers = ({ role }) => {
                       onChange={(e) =>
                         setFormData({ ...formData, dob: e.target.value })
                       }
-                      className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                      className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                     />
                   </div>
                 </>
@@ -318,7 +318,7 @@ const AdminUsers = ({ role }) => {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-black text-white rounded-lg font-bold hover:bg-neutral-800 transition"
+                className="w-full py-3 bg-black text-white  font-bold hover:bg-neutral-800 transition"
               >
                 Save
               </button>

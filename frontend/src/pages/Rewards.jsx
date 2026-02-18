@@ -63,14 +63,14 @@ const Rewards = () => {
       <main className="p-4 max-w-lg mx-auto space-y-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-neutral-800 p-5 rounded-xl ring-1 ring-white/5 text-center">
+          <div className="bg-neutral-800 p-5  ring-1 ring-white/5 text-center">
             <div className="flex justify-center mb-2">
               <Award className="text-purple-400 w-8 h-8" />
             </div>
             <h3 className="text-3xl font-bold">{summary.total_points}</h3>
             <p className="text-sm text-neutral-400">Total Points</p>
           </div>
-          <div className="bg-neutral-800 p-5 rounded-xl ring-1 ring-white/5 text-center">
+          <div className="bg-neutral-800 p-5  ring-1 ring-white/5 text-center">
             <div className="flex justify-center mb-2">
               <Zap className="text-yellow-400 w-8 h-8" />
             </div>
@@ -86,7 +86,7 @@ const Rewards = () => {
           </h2>
 
           {history.badges.length === 0 ? (
-            <div className="p-6 text-center bg-neutral-800 rounded-xl">
+            <div className="p-6 text-center bg-neutral-800 ">
               <p className="text-neutral-400">
                 No badges earned yet. Keep taking your meds on time!
               </p>
@@ -96,10 +96,10 @@ const Rewards = () => {
               {history.badges.map((badge, idx) => (
                 <div
                   key={idx}
-                  className="bg-neutral-800 p-3 rounded-lg text-center ring-1 ring-white/5"
+                  className="bg-neutral-800 p-3  text-center ring-1 ring-white/5"
                 >
                   <div
-                    className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center mb-2 
+                    className={`w-10 h-10 mx-auto  flex items-center justify-center mb-2 
                                         ${
                                           badge.badge_type === "gold"
                                             ? "bg-yellow-500/20 text-yellow-500"
@@ -127,7 +127,7 @@ const Rewards = () => {
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <History className="w-5 h-5 text-blue-400" /> Points History
           </h2>
-          <div className="bg-neutral-800 rounded-2xl overflow-hidden ring-1 ring-white/5">
+          <div className="bg-neutral-800  overflow-hidden ring-1 ring-white/5">
             {history.transactions.length === 0 && (
               <div className="p-6 text-center text-neutral-500">
                 No activity yet.
@@ -151,7 +151,7 @@ const Rewards = () => {
         </div>
 
         {/* How it works */}
-        <div className="bg-neutral-800/50 p-6 rounded-2xl ring-1 ring-white/5">
+        <div className="bg-neutral-800/50 p-6  ring-1 ring-white/5">
           <h3 className="font-bold flex items-center gap-2 mb-4">
             <Info className="w-5 h-5" /> How Rewards Work
           </h3>

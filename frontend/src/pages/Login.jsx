@@ -28,7 +28,7 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-neutral-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg border border-neutral-200">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white  shadow-lg border border-neutral-200">
         <h2 className="text-3xl font-bold text-center text-neutral-900 tracking-tight">
           ART Companion
         </h2>
@@ -44,7 +44,7 @@ const Login = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 mt-1 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none transition"
+              className="w-full px-4 py-2 mt-1 border border-neutral-300  focus:ring-2 focus:ring-black focus:outline-none transition"
               required
             />
           </div>
@@ -56,13 +56,13 @@ const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 mt-1 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none transition"
+              className="w-full px-4 py-2 mt-1 border border-neutral-300  focus:ring-2 focus:ring-black focus:outline-none transition"
               required
             />
           </div>
           <button
             type="submit"
-            className="w-full py-2 font-semibold text-white bg-black rounded-lg hover:bg-neutral-800 transition transform active:scale-95"
+            className="w-full py-2 font-semibold text-white bg-black  hover:bg-neutral-800 transition transform active:scale-95"
           >
             Sign In
           </button>

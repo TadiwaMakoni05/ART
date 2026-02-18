@@ -34,14 +34,14 @@ const ProviderPatients = () => {
         </div>
         <button
           onClick={() => navigate("/provider/patients/new")}
-          className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition flex items-center gap-2"
+          className="bg-black text-white px-4 py-2  text-sm font-medium hover:bg-neutral-800 transition flex items-center gap-2"
         >
           <Plus className="w-4 h-4" /> New Patient
         </button>
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="hidden md:block bg-white  shadow-sm border border-neutral-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-neutral-50 border-b border-neutral-200">
@@ -79,14 +79,14 @@ const ProviderPatients = () => {
                   <td className="px-6 py-4 flex items-center gap-3">
                     <a
                       href={`tel:${patient.phone}`}
-                      className="p-2 text-neutral-500 hover:text-green-600 transition bg-neutral-100 rounded-full"
+                      className="p-2 text-neutral-500 hover:text-green-600 transition bg-neutral-100 "
                       title="Call"
                     >
                       <Phone className="w-4 h-4" />
                     </a>
                     <button
                       onClick={() => navigate("/provider/messages")}
-                      className="p-2 text-neutral-500 hover:text-blue-600 transition bg-neutral-100 rounded-full"
+                      className="p-2 text-neutral-500 hover:text-blue-600 transition bg-neutral-100 "
                       title="Message"
                     >
                       <MessageSquare className="w-4 h-4" />
@@ -95,7 +95,7 @@ const ProviderPatients = () => {
                       onClick={() =>
                         navigate(`/provider/patients/${patient.id}`)
                       }
-                      className="p-2 text-neutral-500 hover:text-black transition bg-neutral-100 rounded-full"
+                      className="p-2 text-neutral-500 hover:text-black transition bg-neutral-100 "
                       title="View Profile"
                     >
                       <Search className="w-4 h-4" />
@@ -123,7 +123,7 @@ const ProviderPatients = () => {
         {patients.map((patient) => (
           <div
             key={patient.id}
-            className="bg-white p-4 rounded-xl shadow-sm border border-neutral-200 space-y-3"
+            className="bg-white p-4  shadow-sm border border-neutral-200 space-y-3"
           >
             <div className="flex justify-between items-start">
               <div>
@@ -145,19 +145,19 @@ const ProviderPatients = () => {
             <div className="flex gap-2 pt-2 border-t border-neutral-100">
               <a
                 href={`tel:${patient.phone}`}
-                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50 rounded-lg hover:bg-neutral-100"
+                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50  hover:bg-neutral-100"
               >
                 Call
               </a>
               <button
                 onClick={() => navigate("/provider/messages")}
-                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50 rounded-lg hover:bg-neutral-100"
+                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50  hover:bg-neutral-100"
               >
                 Message
               </button>
               <button
                 onClick={() => navigate(`/provider/patients/${patient.id}`)}
-                className="flex-1 py-2 text-center text-sm font-medium text-white bg-black rounded-lg hover:bg-neutral-800"
+                className="flex-1 py-2 text-center text-sm font-medium text-white bg-black  hover:bg-neutral-800"
               >
                 View
               </button>

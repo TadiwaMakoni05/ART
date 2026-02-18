@@ -69,7 +69,7 @@ const AdminLayout = () => {
               to={item.path}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                `flex items-center gap-3 px-4 py-3  transition-colors ${
                   isActive
                     ? "bg-neutral-800 text-white"
                     : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
@@ -84,7 +84,7 @@ const AdminLayout = () => {
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-800">
           <div className="flex items-center gap-3 px-4 py-3 mb-2">
-            <div className="w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center text-xs font-bold">
+            <div className="w-8 h-8  bg-neutral-700 flex items-center justify-center text-xs font-bold">
               {user?.username?.substring(0, 2).toUpperCase()}
             </div>
             <div className="overflow-hidden">

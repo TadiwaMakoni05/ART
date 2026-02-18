@@ -50,7 +50,7 @@ const PatientHistory = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-neutral-100 rounded-full"
+            className="p-2 hover:bg-neutral-100 "
           >
             <ChevronRight className="w-6 h-6 rotate-180" />
           </button>
@@ -64,13 +64,13 @@ const PatientHistory = () => {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="bg-neutral-100 rounded-lg p-2 text-sm outline-none flex-1"
+              className="bg-neutral-100  p-2 text-sm outline-none flex-1"
             />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="bg-neutral-100 rounded-lg p-2 text-sm outline-none flex-1"
+              className="bg-neutral-100  p-2 text-sm outline-none flex-1"
             />
           </div>
           <div className="flex gap-2 justify-between items-center">
@@ -80,7 +80,7 @@ const PatientHistory = () => {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="bg-neutral-100 border-none rounded-lg p-2 text-sm font-medium outline-none text-neutral-600"
+              className="bg-neutral-100 border-none  p-2 text-sm font-medium outline-none text-neutral-600"
             >
               <option value="all">All Logs</option>
               <option value="taken">Taken</option>
@@ -101,7 +101,7 @@ const PatientHistory = () => {
             No history found for selected range.
           </div>
         ) : (
-          <div className="bg-neutral-800 rounded-xl border border-neutral-700 overflow-hidden">
+          <div className="bg-neutral-800  border border-neutral-700 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm min-w-[500px]">
                 <tbody>
@@ -113,7 +113,7 @@ const PatientHistory = () => {
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div
-                            className={`p-2 rounded-full ${log.status === "taken" ? "bg-green-100 text-green-600" : log.status === "snoozed" ? "bg-blue-100 text-blue-600" : "bg-red-100 text-red-600"}`}
+                            className={`p-2  ${log.status === "taken" ? "bg-green-100 text-green-600" : log.status === "snoozed" ? "bg-blue-100 text-blue-600" : "bg-red-100 text-red-600"}`}
                           >
                             {log.status === "taken" ? (
                               <CheckCircle className="w-5 h-5" />
@@ -140,12 +140,12 @@ const PatientHistory = () => {
                       </td>
                       <td className="p-4 text-right">
                         <span
-                          className={`text-xs font-bold uppercase px-2 py-1 rounded-md ${log.status === "taken" ? "bg-green-50 text-green-600" : log.status === "snoozed" ? "bg-blue-50 text-blue-600" : "bg-red-50 text-red-600"}`}
+                          className={`text-xs font-bold uppercase px-2 py-1  ${log.status === "taken" ? "bg-green-50 text-green-600" : log.status === "snoozed" ? "bg-blue-50 text-blue-600" : "bg-red-50 text-red-600"}`}
                         >
                           {log.status}
                         </span>
                         {log.actual_time && (
-                          <div className="text-xs text-neutral-500 bg-neutral-50 p-2 rounded mt-2">
+                          <div className="text-xs text-neutral-500 bg-neutral-50 p-2  mt-2">
                             <span>Taken at:</span>
                             <span className="font-mono block">
                               {new Date(log.actual_time).toLocaleTimeString(

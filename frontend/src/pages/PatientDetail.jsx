@@ -66,7 +66,7 @@ const PatientDetail = () => {
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
         </button>
 
-        <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-8">
+        <div className="bg-white  shadow-sm border border-neutral-200 p-8">
           <div className="flex flex-col md:flex-row justify-between items-start gap-4">
             <div>
               <h1 className="text-3xl font-bold mb-2 break-all">
@@ -97,11 +97,11 @@ const PatientDetail = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Regimen Column */}
-          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
+          <div className="bg-white  shadow-sm border border-neutral-200 p-6">
             <h2 className="text-lg font-semibold mb-4">Regimen</h2>
             <ul className="space-y-4">
               {regimen.map((med) => (
-                <li key={med.id} className="p-4 bg-neutral-50 rounded-lg">
+                <li key={med.id} className="p-4 bg-neutral-50 ">
                   <div className="font-medium">{med.medication_name}</div>
                   <div className="text-sm text-neutral-500">
                     {med.dosage} @ {med.scheduled_time}
@@ -115,7 +115,7 @@ const PatientDetail = () => {
           </div>
 
           {/* Adherence Chart Column */}
-          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 flex flex-col items-center">
+          <div className="bg-white  shadow-sm border border-neutral-200 p-6 flex flex-col items-center">
             <h2 className="text-lg font-semibold mb-4 w-full text-left">
               Adherence Breakdown
             </h2>
@@ -147,17 +147,17 @@ const PatientDetail = () => {
           </div>
 
           {/* History List Column */}
-          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
+          <div className="bg-white  shadow-sm border border-neutral-200 p-6">
             <h2 className="text-lg font-semibold mb-4">Recent Logs</h2>
             <ul className="space-y-2 max-h-[300px] overflow-y-auto">
               {logs.map((log) => (
                 <li
                   key={log.id}
-                  className="flex justify-between items-center text-sm p-2 hover:bg-neutral-50 rounded"
+                  className="flex justify-between items-center text-sm p-2 hover:bg-neutral-50 "
                 >
                   <span>{new Date(log.created_at).toLocaleDateString()}</span>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    className={`px-2 py-0.5  text-xs font-medium ${
                       log.status === "taken"
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"

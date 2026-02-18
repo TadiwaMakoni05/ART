@@ -6,7 +6,7 @@ export const AdherenceBadge = ({ score }) => {
   else if (score >= 75) color = "bg-yellow-100 text-yellow-800";
 
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-bold ${color}`}>
+    <span className={`px-2 py-1  text-xs font-bold ${color}`}>
       {score}%
     </span>
   );

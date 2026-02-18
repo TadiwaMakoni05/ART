@@ -73,8 +73,8 @@ const CreatePatient = () => {
 
     return (
       <div className="min-h-screen bg-neutral-50 p-8 flex items-center justify-center">
-        <div className="max-w-xl w-full bg-white rounded-xl shadow-lg border border-neutral-200 p-8 text-center space-y-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+        <div className="max-w-xl w-full bg-white  shadow-lg border border-neutral-200 p-8 text-center space-y-6">
+          <div className="w-16 h-16 bg-green-100  flex items-center justify-center mx-auto">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h2 className="text-2xl font-bold">Patient Account Created!</h2>
@@ -83,7 +83,7 @@ const CreatePatient = () => {
           </p>
 
           {/* Credentials Box */}
-          <div className="bg-neutral-50 p-6 rounded-lg border border-neutral-200 text-left space-y-3">
+          <div className="bg-neutral-50 p-6  border border-neutral-200 text-left space-y-3">
             {["Username", "Password"].map((field) => {
               const value = field === "Username" ? username : password;
               return (
@@ -124,14 +124,14 @@ const CreatePatient = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <a
                 href={telLink}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+                className="flex flex-col items-center gap-2 p-4  bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
               >
                 <Phone className="w-6 h-6" />
                 <span className="text-xs font-medium">Call</span>
               </a>
               <a
                 href={mailtoSmS}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition"
+                className="flex flex-col items-center gap-2 p-4  bg-gray-50 text-gray-700 hover:bg-gray-100 transition"
               >
                 <Mail className="w-6 h-6" />
                 <span className="text-xs font-medium">SMS</span>
@@ -140,7 +140,7 @@ const CreatePatient = () => {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center gap-2 p-4 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition"
+                className="flex flex-col items-center gap-2 p-4  bg-green-50 text-green-700 hover:bg-green-100 transition"
               >
                 <MessageSquare className="w-6 h-6" />
                 <span className="text-xs font-medium">WhatsApp</span>
@@ -150,7 +150,7 @@ const CreatePatient = () => {
 
           <button
             onClick={() => navigate("/provider")}
-            className="w-full py-3 bg-black text-white rounded-lg font-bold hover:bg-neutral-800 transition flex items-center justify-center gap-2"
+            className="w-full py-3 bg-black text-white  font-bold hover:bg-neutral-800 transition flex items-center justify-center gap-2"
           >
             Done <ArrowRight className="w-4 h-4" />
           </button>
@@ -162,7 +162,7 @@ const CreatePatient = () => {
   // Patient creation form
   return (
     <div className="min-h-screen bg-neutral-50 p-4 md:p-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-neutral-200 p-6 md:p-8">
+      <div className="max-w-3xl mx-auto bg-white  shadow-sm border border-neutral-200 p-6 md:p-8">
         <h1 className="text-2xl font-bold mb-6">Register New Patient</h1>
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Personal Info */}
@@ -179,7 +179,7 @@ const CreatePatient = () => {
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                  className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                   required
                 />
               </div>
@@ -191,7 +191,7 @@ const CreatePatient = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                  className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                   required
                 />
               </div>
@@ -204,7 +204,7 @@ const CreatePatient = () => {
                   name="dob"
                   value={formData.dob}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded-lg focus:ring-2 ring-black outline-none"
+                  className="w-full p-2 border  focus:ring-2 ring-black outline-none"
                   required
                 />
               </div>
@@ -237,7 +237,7 @@ const CreatePatient = () => {
                         e.target.value,
                       )
                     }
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border "
                     required
                   />
                 </div>
@@ -252,7 +252,7 @@ const CreatePatient = () => {
                       onChange={(e) =>
                         handleRegimenChange(index, "dosage", e.target.value)
                       }
-                      className="w-full p-2 border rounded-lg"
+                      className="w-full p-2 border "
                       required
                     />
                   </div>
@@ -268,7 +268,7 @@ const CreatePatient = () => {
                       onChange={(e) =>
                         handleRegimenChange(index, "time", e.target.value)
                       }
-                      className="w-full p-2 border rounded-lg"
+                      className="w-full p-2 border "
                       required
                     />
                   </div>
@@ -289,14 +289,14 @@ const CreatePatient = () => {
             <button
               type="button"
               onClick={() => navigate("/provider")}
-              className="flex-1 py-3 text-neutral-600 hover:text-black font-medium border border-neutral-300 rounded-lg"
+              className="flex-1 py-3 text-neutral-600 hover:text-black font-medium border border-neutral-300 "
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-3 bg-black text-white rounded-lg font-semibold hover:bg-neutral-800 transition shadow-lg shadow-black/20"
+              className="flex-1 py-3 bg-black text-white  font-semibold hover:bg-neutral-800 transition shadow-lg shadow-black/20"
             >
               {loading ? "Creating..." : "Create Patient Account"}
             </button>

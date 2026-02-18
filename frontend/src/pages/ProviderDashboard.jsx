@@ -17,7 +17,7 @@ import {
 
 const StatCard = ({ title, value, warning, icon }) => (
   <div
-    className={`p-6 bg-white rounded-xl shadow-sm border ${warning ? "border-red-200 bg-red-50/20" : "border-neutral-200"}`}
+    className={`p-6 bg-white  shadow-sm border ${warning ? "border-red-200 bg-red-50/20" : "border-neutral-200"}`}
   >
     <div className="flex justify-between items-start">
       <p className="text-sm font-medium text-neutral-500">{title}</p>
@@ -108,7 +108,7 @@ const ProviderDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Adherence Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+        <div className="bg-white p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-semibold mb-4">Adherence Rate</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -141,7 +141,7 @@ const ProviderDashboard = () => {
         </div>
 
         {/* Activity Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+        <div className="bg-white p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-semibold mb-4">Weekly Log Activity</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">

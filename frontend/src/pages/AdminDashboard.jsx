@@ -15,12 +15,12 @@ import {
 } from "recharts";
 
 const StatCard = ({ title, value, icon, color }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200 flex items-start justify-between">
+  <div className="bg-white p-6  shadow-sm border border-neutral-200 flex items-start justify-between">
     <div>
       <p className="text-sm font-medium text-neutral-500 mb-1">{title}</p>
       <h3 className="text-2xl font-bold text-neutral-900">{value}</h3>
     </div>
-    <div className={`p-3 rounded-lg ${color}`}>{icon}</div>
+    <div className={`p-3  ${color}`}>{icon}</div>
   </div>
 );
 
@@ -106,7 +106,7 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Adherence Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+        <div className="bg-white p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-bold mb-4">System Adherence</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -139,7 +139,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* User Growth Chart (Mocked for now) */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+        <div className="bg-white p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-bold mb-4">User Growth Trends</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -167,7 +167,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Recent Activity Feed */}
-      <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="bg-white  shadow-sm border border-neutral-200 overflow-hidden">
         <div className="p-6 border-b border-neutral-200">
           <h3 className="text-lg font-bold">Recent Activity</h3>
         </div>
@@ -178,7 +178,7 @@ const AdminDashboard = () => {
               className="p-4 flex items-center justify-between hover:bg-neutral-50 transition"
             >
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                <div className="w-2 h-2  bg-blue-500"></div>
                 <p className="font-medium text-neutral-900">{log.action}</p>
                 <span className="text-neutral-500 text-sm">({log.target})</span>
               </div>

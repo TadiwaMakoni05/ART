@@ -57,15 +57,19 @@ const Learn = () => {
     const fetchQuotes = async () => {
       try {
         const res = await api.get("learn/home-quotes/?mode=all");
-        const quotes = res.data.map((q, index) => ({
-          id: `q${index}`,
+        const quotes = res.data.map((q) => ({
+          id: `quote-${q.id}`,
           type: "quote",
           title: q.author || "Unknown",
           category: q.category?.toLowerCase().trim() || "unknown", // normalize category
           content: q.text,
           icon: <QuoteIcon />,
         }));
-        setItems((prev) => [...prev, ...quotes]);
+        setItems((prev) => {
+          const existingIds = new Set(prev.map((item) => item.id));
+          const newQuotes = quotes.filter((q) => !existingIds.has(q.id));
+          return [...prev, ...newQuotes];
+        });
       } catch (error) {
         console.error("Error fetching quotes", error);
       }
@@ -95,7 +99,7 @@ const Learn = () => {
         <div className="flex items-center gap-4 mb-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-neutral-100 rounded-full"
+            className="p-2 hover:bg-neutral-100 "
           >
             <ChevronRight className="w-6 h-6 rotate-180" />
           </button>
@@ -108,7 +112,7 @@ const Learn = () => {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap capitalize transition ${
+              className={`px-4 py-2  text-sm font-medium whitespace-nowrap capitalize transition ${
                 activeCategory === cat
                   ? "bg-black text-white shadow-lg"
                   : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
@@ -125,14 +129,14 @@ const Learn = () => {
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            className={`bg-white p-6 rounded-2xl shadow-sm border border-neutral-100 hover:shadow-md transition flex flex-col justify-between h-full ${
+            className={`bg-white p-6  shadow-sm border border-neutral-100 hover:shadow-md transition flex flex-col justify-between h-full ${
               item.type === "quote" ? "border-l-4 border-l-yellow-400" : ""
             }`}
           >
             <div>
               <div className="flex items-start justify-between mb-3">
                 <span
-                  className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
+                  className={`px-2 py-1  text-xs font-bold uppercase tracking-wider ${
                     item.category === "health" || item.category === "physical"
                       ? "bg-blue-100 text-blue-800"
                       : item.category === "spiritual"
@@ -175,27 +179,27 @@ const Learn = () => {
 
 // Icons
 const ActivityIcon = () => (
-  <div className="p-2 bg-blue-50 rounded-full text-blue-600">
+  <div className="p-2 bg-blue-50  text-blue-600">
     <Info className="w-5 h-5" />
   </div>
 );
 const HeartIcon = () => (
-  <div className="p-2 bg-purple-50 rounded-full text-purple-600">
+  <div className="p-2 bg-purple-50  text-purple-600">
     <Heart className="w-5 h-5" />
   </div>
 );
 const PillIcon = () => (
-  <div className="p-2 bg-red-50 rounded-full text-red-600">
+  <div className="p-2 bg-red-50  text-red-600">
     <BookOpen className="w-5 h-5" />
   </div>
 );
 const UsersIcon = () => (
-  <div className="p-2 bg-green-50 rounded-full text-green-600">
+  <div className="p-2 bg-green-50  text-green-600">
     <Users className="w-5 h-5" />
   </div>
 );
 const QuoteIcon = () => (
-  <div className="p-2 bg-yellow-50 rounded-full text-yellow-600">
+  <div className="p-2 bg-yellow-50  text-yellow-600">
     <Quote className="w-5 h-5" />
   </div>
 );

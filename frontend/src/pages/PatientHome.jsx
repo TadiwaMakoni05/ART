@@ -229,7 +229,7 @@ const PatientHome = () => {
           >
             Logout
           </button>
-          <div className="w-8 h-8 bg-neutral-800 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-800  flex items-center justify-center">
             <span className="text-xs font-bold">
               {(user?.full_name || user?.username)?.[0].toUpperCase()}
             </span>
@@ -239,7 +239,7 @@ const PatientHome = () => {
 
       <main className="p-4 max-w-lg mx-auto space-y-6">
         {/* Gamification Header Widget */}
-        <div className="bg-gradient-to-br bg-white  rounded-2xl p-6 ring-1 ring-black relative overflow-hidden">
+        <div className="bg-gradient-to-br bg-white   p-6 ring-1 ring-black relative overflow-hidden">
           {showAnimation && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20 animate-in fade-in zoom-in duration-300">
               <div className="text-center">
@@ -281,7 +281,7 @@ const PatientHome = () => {
                 {gamification.current_streak > 0 ? "On Fire!" : "Keep going!"}
               </span>
             </div>
-            <div className="h-3 bg-neutral-800 rounded-full overflow-hidden">
+            <div className="h-3 bg-neutral-800  overflow-hidden">
               {/* Mock progress based on streak or logs, ideally calculated from weekly adherence */}
               <div
                 className="h-full bg-indigo-500 transition-all duration-1000 ease-out"
@@ -294,7 +294,7 @@ const PatientHome = () => {
         </div>
 
         {/* Motivation Widget */}
-        <div className="bg-neutral-800 rounded-2xl p-6 ring-1 ring-white/10 relative overflow-hidden min-h-[160px] flex flex-col justify-center">
+        <div className="bg-neutral-800  p-6 ring-1 ring-white/10 relative overflow-hidden min-h-[160px] flex flex-col justify-center">
           {quotes.length > 0 ? (
             <div className="animate-in fade-in slide-in-from-right duration-700 key={currentQuoteIndex}">
               <p className="text-xl font-light italic text-neutral-300 mb-4">
@@ -303,7 +303,7 @@ const PatientHome = () => {
               <div className="flex justify-between items-center text-xs text-neutral-500 uppercase tracking-wider">
                 <span>{quotes[currentQuoteIndex].author || "Unknown"}</span>
                 <span
-                  className={`px-2 py-1 rounded-full bg-white/5 ${
+                  className={`px-2 py-1  bg-white/5 ${
                     quotes[currentQuoteIndex].category === "spiritual"
                       ? "text-blue-400"
                       : quotes[currentQuoteIndex].category === "mental"
@@ -334,7 +334,7 @@ const PatientHome = () => {
         {prescriptions.length > 0 ? (
           <div className="grid grid-cols-2 gap-4">
             {/* Pill Count / Refill */}
-            <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20">
+            <div className="bg-neutral-800 p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
               <div className="flex items-center gap-2 mb-2 text-blue-400">
                 <Clock className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">
@@ -353,7 +353,7 @@ const PatientHome = () => {
             </div>
 
             {/* Review Date */}
-            <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20">
+            <div className="bg-neutral-800 p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
               <div className="flex items-center gap-2 mb-2 text-purple-400">
                 <Calendar className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">
@@ -372,7 +372,7 @@ const PatientHome = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-neutral-800 p-4 rounded-xl ring-1 ring-white/5 shadow-lg shadow-black/20 text-neutral-500 text-sm">
+          <div className="bg-neutral-800 p-4  ring-1 ring-white/5 shadow-lg shadow-black/20 text-neutral-500 text-sm">
             No active prescriptions
           </div>
         )}
@@ -399,7 +399,7 @@ const PatientHome = () => {
             return (
               <div
                 key={med.id}
-                className="bg-neutral-800 rounded-xl p-5 ring-1 ring-white/5 flex justify-between items-center shadow-lg shadow-black/20"
+                className="bg-neutral-800  p-5 ring-1 ring-white/5 flex justify-between items-center shadow-lg shadow-black/20"
               >
                 <div>
                   <h4 className="font-semibold text-lg">
@@ -411,25 +411,25 @@ const PatientHome = () => {
                 </div>
 
                 {isTaken ? (
-                  <div className="flex items-center gap-2 text-green-400 bg-green-400/10 px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="flex items-center gap-2 text-green-400 bg-green-400/10 px-3 py-1  text-sm font-medium">
                     <Check className="w-4 h-4" /> Taken
                   </div>
                 ) : isMissed ? (
-                  <div className="flex items-center gap-2 text-red-400 bg-red-400/10 px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="flex items-center gap-2 text-red-400 bg-red-400/10 px-3 py-1  text-sm font-medium">
                     <X className="w-4 h-4" /> Missed
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleLog(med, "taken", todayLog)}
-                      className="bg-white text-black p-2 rounded-full hover:bg-neutral-200 transition"
+                      className="bg-white text-black p-2  hover:bg-neutral-200 transition"
                       title="Mark as Taken"
                     >
                       <Check className="w-6 h-6" />
                     </button>
                     <button
                       onClick={() => handleLog(med, "missed", todayLog)}
-                      className="bg-neutral-800 text-neutral-400 p-2 rounded-full ring-1 ring-neutral-700 hover:bg-neutral-700 transition"
+                      className="bg-neutral-800 text-neutral-400 p-2  ring-1 ring-neutral-700 hover:bg-neutral-700 transition"
                       title="Mark as Missed"
                     >
                       <X className="w-6 h-6" />

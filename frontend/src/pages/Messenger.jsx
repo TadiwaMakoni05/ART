@@ -219,7 +219,7 @@ const Messenger = () => {
                     <span className="font-semibold truncate">{conv.name}</span>
                     {conv.isOnline && (
                       <div
-                        className="w-2 h-2 bg-green-500 rounded-full"
+                        className="w-2 h-2 bg-green-500 "
                         title="Online"
                       ></div>
                     )}
@@ -247,7 +247,7 @@ const Messenger = () => {
                     </span>
                   )}
                   {conv.unreadCount > 0 && (
-                    <div className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                    <div className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5  min-w-[1.25rem] text-center">
                       {conv.unreadCount}
                     </div>
                   )}
@@ -274,7 +274,7 @@ const Messenger = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setActiveConversation(null)}
-                  className="md:hidden p-2 -ml-2 hover:bg-neutral-100 rounded-full"
+                  className="md:hidden p-2 -ml-2 hover:bg-neutral-100 "
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
@@ -284,13 +284,13 @@ const Messenger = () => {
                 {activeConversation.phone && (
                   <a
                     href={`tel:${activeConversation.phone}`}
-                    className="p-2 hover:bg-neutral-100 rounded-full flex items-center justify-center text-black"
+                    className="p-2 hover:bg-neutral-100  flex items-center justify-center text-black"
                     title={`Call ${activeConversation.phone}`}
                   >
                     <Phone className="w-5 h-5" />
                   </a>
                 )}
-                <button className="p-2 hover:bg-neutral-100 rounded-full">
+                <button className="p-2 hover:bg-neutral-100 ">
                   <MoreVertical className="w-5 h-5" />
                 </button>
               </div>
@@ -308,13 +308,13 @@ const Messenger = () => {
                     className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[70%] rounded-2xl p-3 ${isMe ? "bg-black text-white rounded-br-none" : "bg-white text-black border border-neutral-200 rounded-bl-none"}`}
+                      className={`max-w-[70%]  p-3 ${isMe ? "bg-black text-white -none" : "bg-white text-black border border-neutral-200 -none"}`}
                     >
                       {msg.image && (
                         <img
                           src={msg.image}
                           alt="attachment"
-                          className="rounded-lg mb-2 max-h-48 object-cover cursor-pointer hover:opacity-90 transition"
+                          className=" mb-2 max-h-48 object-cover cursor-pointer hover:opacity-90 transition"
                           onClick={() => setSelectedImage(msg.image)}
                         />
                       )}
@@ -338,15 +338,15 @@ const Messenger = () => {
             {/* Input */}
             <div className="p-4 bg-white border-t border-neutral-200">
               {image && (
-                <div className="mb-2 p-2 bg-neutral-100 rounded-lg flex justify-between items-center w-max relative">
+                <div className="mb-2 p-2 bg-neutral-100  flex justify-between items-center w-max relative">
                   <img
                     src={URL.createObjectURL(image)}
                     alt="Preview"
-                    className="h-20 w-auto rounded-lg object-cover"
+                    className="h-20 w-auto  object-cover"
                   />
                   <button
                     onClick={() => setImage(null)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md hover:bg-red-600 transition"
+                    className="absolute -top-2 -right-2 bg-red-500 text-white  w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md hover:bg-red-600 transition"
                   >
                     ×
                   </button>
@@ -356,7 +356,7 @@ const Messenger = () => {
                 </div>
               )}
               <form onSubmit={handleSend} className="flex gap-2 items-center">
-                <label className="cursor-pointer p-2 hover:bg-neutral-100 rounded-full text-neutral-500 transition">
+                <label className="cursor-pointer p-2 hover:bg-neutral-100  text-neutral-500 transition">
                   <Image className="w-5 h-5" />
                   <input
                     type="file"
@@ -369,12 +369,12 @@ const Messenger = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Type a message..."
-                  className="flex-1 p-2 border border-neutral-300 rounded-full px-4 focus:ring-2 ring-black outline-none"
+                  className="flex-1 p-2 border border-neutral-300  px-4 focus:ring-2 ring-black outline-none"
                 />
                 <button
                   type="submit"
                   disabled={!newMessage.trim() && !image}
-                  className="p-2 bg-black text-white rounded-full hover:bg-neutral-800 disabled:opacity-50 transition"
+                  className="p-2 bg-black text-white  hover:bg-neutral-800 disabled:opacity-50 transition"
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -395,7 +395,7 @@ const Messenger = () => {
           onClick={() => setSelectedImage(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-full"
+            className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 "
             onClick={() => setSelectedImage(null)}
           >
             <X className="w-8 h-8" />
@@ -403,7 +403,7 @@ const Messenger = () => {
           <img
             src={selectedImage}
             alt="Full preview"
-            className="max-w-full max-h-full rounded-lg object-contain"
+            className="max-w-full max-h-full  object-contain"
             onClick={(e) => e.stopPropagation()}
           />
         </div>

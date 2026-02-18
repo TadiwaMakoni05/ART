@@ -67,7 +67,7 @@ const ProviderLayout = () => {
               to={item.path}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                `flex items-center gap-3 px-4 py-3  transition-colors ${
                   isActive
                     ? "bg-black text-white"
                     : "text-neutral-500 hover:bg-neutral-100 hover:text-black"
@@ -82,7 +82,7 @@ const ProviderLayout = () => {
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200">
           <div className="flex items-center gap-3 px-4 py-3 mb-2">
-            <div className="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-700">
+            <div className="w-8 h-8  bg-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-700">
               {user?.username?.substring(0, 2).toUpperCase()}
             </div>
             <div className="overflow-hidden">
