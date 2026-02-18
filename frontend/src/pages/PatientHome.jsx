@@ -40,7 +40,7 @@ const PatientHome = () => {
 
   // Audio for reminders
   const audioRef = useRef(
-    new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch.ogg"),
+    new Audio("/frontend/public/universfield-clean-mobile-tone-454836.mp3"),
   );
   const [lastNotifiedTime, setLastNotifiedTime] = useState(null);
 
