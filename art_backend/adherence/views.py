@@ -1,0 +1,566 @@
+from rest_framework import viewsets, status, permissions, generics, views
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.db.models import Count, Q
+from django.utils import timezone
+import datetime
+
+from .models import (
+    User, PatientProfile, MedicationSchedule, AdherenceLog, ProviderPatientLink, Alert, CounselingMessage,
+    PointTransaction, WeeklyConsistencyBadge, Quote, Prescription
+)
+from .serializers import (
+    UserSerializer, PatientProfileSerializer, MedicationScheduleSerializer,
+    AdherenceLogSerializer, CreatePatientSerializer, DashboardMetricsSerializer,
+    CounselingMessageSerializer, MyTokenObtainPairSerializer,
+    PatientGamificationProfileSerializer, PointTransactionSerializer, WeeklyConsistencyBadgeSerializer,
+    QuoteSerializer, PrescriptionSerializer
+)
+
+class QuoteView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        mode = request.query_params.get('mode', 'random')
+        
+        if mode == 'all':
+            quotes = Quote.objects.all()
+            serializer = QuoteSerializer(quotes, many=True)
+            return Response(serializer.data)
+
+        # Randomly select 3 quotes
+        count = Quote.objects.count()
+        if count == 0:
+            return Response([])
+        
+        # Inefficient for large tables, but fine for MVP
+        random_quotes = Quote.objects.order_by('?')[:3]
+        serializer = QuoteSerializer(random_quotes, many=True)
+        return Response(serializer.data)
+
+class AnalyticsView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.role != 'patient':
+            return Response({"error": "Only patients have analytics"}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            profile = user.patient_profile
+        except PatientProfile.DoesNotExist:
+             return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # 1. Total Counts
+        logs = AdherenceLog.objects.filter(patient=profile)
+        total_taken = logs.filter(status='taken').count()
+        total_missed = logs.filter(status='missed').count()
+        total_snoozed = logs.filter(status='snoozed').count()
+
+        # 2. Daily Adherence Trend (Last 7 Days)
+        today = timezone.now().date()
+        daily_trend = []
+        for i in range(6, -1, -1):
+            date = today - datetime.timedelta(days=i)
+            # Find logs for this day
+            day_logs = logs.filter(scheduled_time__date=date)
+            taken = day_logs.filter(status='taken').count()
+            missed = day_logs.filter(status='missed').count()
+            snoozed = day_logs.filter(status='snoozed').count()
+            
+            # Simple count for chart
+            daily_trend.append({
+                "date": date.strftime("%a %d"),
+                "taken": taken,
+                "missed": missed,
+                "snoozed": snoozed
+            })
+
+        # 3. Weekly Adherence (Last 4 Weeks)
+        # Simplified: just showing Adherence % per week
+        weekly_trend = []
+        current_week_start = today - datetime.timedelta(days=today.weekday())
+        for i in range(3, -1, -1):
+            week_start = current_week_start - datetime.timedelta(weeks=i)
+            week_end = week_start + datetime.timedelta(days=6)
+            
+            # Count scheduled (Approximation: total active meds * 7)
+            # Count taken
+            week_logs = logs.filter(scheduled_time__date__range=[week_start, week_end])
+            taken_count = week_logs.filter(status='taken').count()
+            # For percentage, we need total. Let's use total logs as denominator for now as "scheduled" is hard to reconstruct history perfectly here without complex logic
+            total_week_logs = week_logs.count() # This only counts interactive logs, not missed if not logged
+            
+            # Better denominator: 
+            # We must assume if it wasn't logged, it wasn't due? No, adherence means vs schedule.
+            # Let's count *expected* logs. 
+            # If we rely on logs being created for 'missed' status (which frontend does), then count is fine.
+            # If cron job creates missing logs, fine.
+            # Assuming frontend/user logs everything.
+            
+            percentage = 0
+            if total_week_logs > 0:
+                percentage = round((taken_count / total_week_logs) * 100)
+            
+            weekly_trend.append({
+                "name": f"Week {4-i}", 
+                "week_start": week_start.strftime("%b %d"),
+                "adherence": percentage
+            })
+
+        return Response({
+            "totals": {
+                "taken": total_taken,
+                "missed": total_missed,
+                "snoozed": total_snoozed
+            },
+            "daily_trend": daily_trend,
+            "weekly_trend": weekly_trend
+        })
+
+from .permissions import IsProvider, IsPatient, IsAdmin, IsOwnerOrProvider
+from rest_framework_simplejwt.views import TokenObtainPairView
+import random
+import string
+import re
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+def generate_username(full_name):
+    # Normalize name: John Doe -> john.doe
+    base = full_name.lower().strip()
+    base = re.sub(r'[^a-z0-9]', '.', base)
+    base = re.sub(r'\.+', '.', base).strip('.')
+    
+    username = base
+    counter = 1
+    while User.objects.filter(username=username).exists():
+        username = f"{base}{counter:02d}" # john.doe01
+        counter += 1
+    return username
+
+def generate_random_password():
+    chars = string.ascii_letters + string.digits + "!@#$%"
+    return ''.join(random.choice(chars) for _ in range(10))
+
+class PatientViewSet(viewsets.ModelViewSet):
+    serializer_class = PatientProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'provider':
+            return PatientProfile.objects.filter(provider_link__provider=user)
+        elif user.role == 'patient':
+            return PatientProfile.objects.filter(user=user)
+        return PatientProfile.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        # Custom creation logic for Provider
+        if request.user.role != 'provider':
+            return Response({"error": "Only providers can create patients"}, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = CreatePatientSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        # 1. Create User
+        password = generate_random_password()
+        username = generate_username(data['full_name'])
+        
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            email=data.get('email', ''), # Optional email
+            role='patient'
+        )
+
+        # 2. Create Patient Profile
+        patient = PatientProfile.objects.create(
+            user=user,
+            full_name=data['full_name'],
+            phone=data['phone'],
+            dob=data['dob']
+        )
+
+        # 3. Link to Provider
+        ProviderPatientLink.objects.create(provider=request.user, patient=patient)
+
+        # 4. Create Regimen (Prescriptions + Schedules)
+        regimen_data = data.get('regimen', [])
+        for item in regimen_data:
+            # Create Prescription
+            # Default to 30 pills if not specified
+            # Allow frontend to pass 'total_pills', 'start_date' etc in future
+            total_pills = item.get('total_pills', 30)
+            
+            prescription = Prescription.objects.create(
+                patient=patient,
+                medication_name=item['medication_name'],
+                total_pills=total_pills,
+                current_pills=total_pills,
+                start_date=timezone.now().date(),
+                status='active'
+            )
+            
+            # Create Schedule
+            MedicationSchedule.objects.create(
+                patient=patient,
+                prescription=prescription,
+                medication_name=item['medication_name'], # Deprecated but keep for now
+                dosage=item['dosage'],
+                pills_per_dose=item.get('pills_per_dose', 1),
+                scheduled_time=item['time']
+            )
+
+        # 5. Send Credentials (Mock)
+        # In production: send_sms(data['phone'], username, password)
+        
+        return Response({
+            "message": "Patient created successfully",
+            "credentials": {
+                "username": user.username,
+                "password": password
+            }
+        }, status=status.HTTP_201_CREATED)
+
+class PrescriptionViewSet(viewsets.ModelViewSet):
+    serializer_class = PrescriptionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'patient':
+            return Prescription.objects.filter(patient__user=user)
+        elif user.role == 'provider':
+            patient_id = self.request.query_params.get('patient_id')
+            if patient_id:
+                return Prescription.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
+        return Prescription.objects.none()
+
+class MedicationViewSet(viewsets.ModelViewSet):
+    serializer_class = MedicationScheduleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'patient':
+            return MedicationSchedule.objects.filter(patient__user=user)
+        elif user.role == 'provider':
+            patient_id = self.request.query_params.get('patient_id')
+            if patient_id:
+                return MedicationSchedule.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
+            return MedicationSchedule.objects.none()
+        return MedicationSchedule.objects.none()
+
+class AdherenceViewSet(viewsets.ModelViewSet):
+    serializer_class = AdherenceLogSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = AdherenceLog.objects.none()
+
+        if user.role == 'patient':
+            # Lazy generation for today
+            try:
+                from .utils import generate_daily_doses
+                generate_daily_doses(user.patient_profile)
+            except Exception as e:
+                print(f"Error generating doses: {e}")
+
+            queryset = AdherenceLog.objects.filter(patient__user=user)
+        elif user.role == 'provider':
+            patient_id = self.request.query_params.get('patient_id')
+            if patient_id:
+                 queryset = AdherenceLog.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
+        
+        # Date filtering
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        
+        if start_date:
+            queryset = queryset.filter(scheduled_time__date__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(scheduled_time__date__lte=end_date)
+            
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        if user.role != 'patient':
+             return Response({"error": "Only patients can log adherence"}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Auto-set patient
+        try:
+             patient = user.patient_profile
+        except PatientProfile.DoesNotExist:
+             return Response({"error": "Patient profile not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = request.data.copy()
+        data['patient'] = patient.id
+        
+        # Check if log exists (deduplication handled by uniqueness constraint usually, but we can check here)
+        # Let the serializer handle validation or DB constraint error
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class ProviderDashboardView(views.APIView):
+    permission_classes = [IsProvider]
+
+    def get(self, request):
+        provider = request.user
+        period = request.query_params.get('period', '7d')
+        
+        # 1. Total Patients
+        patients = PatientProfile.objects.filter(provider_link__provider=provider)
+        total_patients = patients.count()
+        
+        # 2. Adherence Percentage (Global for Provider's Patients)
+        thirty_days_ago = timezone.now() - datetime.timedelta(days=30)
+        logs = AdherenceLog.objects.filter(
+            patient__provider_link__provider=provider,
+            scheduled_time__gte=thirty_days_ago
+        )
+        
+        total_logs = logs.count()
+        taken_logs = logs.filter(status='taken').count()
+        
+        adherence_percentage = 0
+        if total_logs > 0:
+            adherence_percentage = round((taken_logs / total_logs) * 100, 1)
+        
+        # 3. Missed Doses (Last 7 Days)
+        seven_days_ago = timezone.now() - datetime.timedelta(days=7)
+        missed_doses = AdherenceLog.objects.filter(
+            patient__provider_link__provider=provider,
+            status='missed',
+            scheduled_time__gte=seven_days_ago
+        ).count()
+        
+        # 4. Active Alerts
+        alerts = Alert.objects.filter(provider=provider, active_flag=True).count()
+        
+        # 5. Daily Trend (Last 7 Days) - Aggregated for all patients
+        daily_trend = []
+        today = timezone.now().date()
+        for i in range(6, -1, -1):
+            date = today - datetime.timedelta(days=i)
+            # Filter logs for this day across ALL provider's patients
+            day_logs = AdherenceLog.objects.filter(
+                patient__provider_link__provider=provider,
+                scheduled_time__date=date
+            )
+            taken = day_logs.filter(status='taken').count()
+            missed = day_logs.filter(status='missed').count()
+            
+            daily_trend.append({
+                "name": date.strftime("%a"), # Mon, Tue, etc.
+                "taken": taken,
+                "missed": missed
+            })
+
+        data = {
+            "total_patients": total_patients,
+            "adherence_percentage": adherence_percentage,
+            "missed_doses": missed_doses,
+            "alerts": alerts,
+            "daily_trend": daily_trend
+        }
+        return Response(data)
+
+class SyncAdherenceView(views.APIView):
+    permission_classes = [IsPatient]
+    
+    def post(self, request):
+        user = request.user
+        # Expect a list of logs
+        logs = request.data.get('logs', [])
+        created_count = 0
+        
+        for log_data in logs:
+            # Check duplication
+            # Assuming log_data contains medication_id, scheduled_time, status, actual_time
+            # and medication_id refers to MedicationSchedule ID
+            # patient is user.patient_profile
+            
+            medication_id = log_data.get('medication')
+            scheduled_time = log_data.get('scheduled_time')
+            
+            exists = AdherenceLog.objects.filter(
+                patient=user.patient_profile,
+                medication_id=medication_id,
+                scheduled_time=scheduled_time
+            ).exists()
+            
+            if not exists:
+                AdherenceLog.objects.create(
+                    patient=user.patient_profile,
+                    medication_id=medication_id,
+                    scheduled_time=scheduled_time,
+                    actual_time=log_data.get('actual_time'),
+                    status=log_data.get('status')
+                )
+                created_count += 1
+                
+        return Response({"synced": created_count}, status=status.HTTP_200_OK)
+
+class ChatbotView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        question = request.data.get('question', '').lower()
+        answer = "I'm sorry, I cannot answer that. Please consult your doctor."
+        
+        # Simple rule-based
+        if 'side effect' in question:
+            answer = "Common side effects include nausea, headache, and fatigue. If severe, contact your provider."
+        elif 'nutrition' in question or 'food' in question:
+            answer = "A balanced diet with plenty of fruits and vegetables is important. Some meds require food."
+        elif 'missed' in question:
+            answer = "If you miss a dose, take it as soon as you remember, unless it's close to your next dose."
+            
+        return Response({"answer": answer})
+
+class MessageViewSet(viewsets.ModelViewSet):
+    serializer_class = CounselingMessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Return messages where user is sender OR receiver
+        return CounselingMessage.objects.filter(
+            Q(sender=user) | Q(receiver=user)
+        ).order_by('timestamp')
+
+    def perform_create(self, serializer):
+        # Auto-set sender to current user
+        serializer.save(sender=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        message = self.get_object()
+        if message.receiver != request.user:
+             return Response({"error": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+        
+        message.is_read = True
+        message.save()
+        return Response({"status": "marked as read"})
+
+class ProviderViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = User.objects.filter(role='provider')
+
+
+class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated] # Or IsPatient
+
+    def get_queryset(self):
+        # Placeholder, we use custom actions
+        return PatientGamificationProfile.objects.none()
+
+    @action(detail=False, methods=['get'])
+    def summary(self, request):
+        user = request.user
+        if user.role != 'patient':
+            return Response({"error": "Only patients have gamification profiles"}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            profile = user.patient_profile.gamification_profile
+        except (PatientProfile.DoesNotExist, PatientGamificationProfile.DoesNotExist):
+             # Auto-create if missing (e.g. old patient)
+            if hasattr(user, 'patient_profile'):
+                profile = PatientGamificationProfile.objects.create(patient=user.patient_profile)
+            else:
+                return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PatientGamificationProfileSerializer(profile)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def history(self, request):
+        user = request.user
+        if user.role != 'patient':
+            return Response({"error": "Only patients have gamification history"}, status=status.HTTP_403_FORBIDDEN)
+            
+        try:
+            patient = user.patient_profile
+        except PatientProfile.DoesNotExist:
+             return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        transactions = PointTransaction.objects.filter(patient=patient).order_by('-created_at')
+        badges = WeeklyConsistencyBadge.objects.filter(patient=patient).order_by('-awarded_at')
+
+        return Response({
+            "transactions": PointTransactionSerializer(transactions, many=True).data,
+            "badges": WeeklyConsistencyBadgeSerializer(badges, many=True).data
+        })
+
+
+# -------------------------------------------------------------------------
+# ADMIN VIEWS
+# -------------------------------------------------------------------------
+
+class AdminDashboardView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+
+    def get(self, request):
+        total_patients = User.objects.filter(role='patient').count()
+        total_providers = User.objects.filter(role='provider').count()
+        
+        # System-wide Adherence (Last 30 days)
+        thirty_days_ago = timezone.now() - datetime.timedelta(days=30)
+        logs = AdherenceLog.objects.filter(scheduled_time__gte=thirty_days_ago)
+        total_logs = logs.count()
+        taken_logs = logs.filter(status='taken').count()
+        
+        system_adherence = 0
+        if total_logs > 0:
+            system_adherence = round((taken_logs / total_logs) * 100, 1)
+
+        # Recent Activity (Last 5 users joined)
+        recent_users = User.objects.order_by('-date_joined')[:5]
+        recent_activity = [{
+            "action": f"New {u.role} joined",
+            "target": u.username,
+            "timestamp": u.date_joined
+        } for u in recent_users]
+
+        data = {
+            "total_patients": total_patients,
+            "total_providers": total_providers,
+            "system_adherence": system_adherence,
+            "recent_activity": recent_activity
+        }
+        return Response(data)
+
+class AdminUserViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        if 'password' in self.request.data:
+            user.set_password(self.request.data['password'])
+            user.save()
+        
+        # Create Profile based on role
+        if user.role == 'patient':
+            PatientProfile.objects.create(
+                user=user, 
+                full_name=self.request.data.get('full_name', user.username),
+                phone=self.request.data.get('phone', ''),
+                dob=self.request.data.get('dob', timezone.now().date())
+            )
+
+    def perform_update(self, serializer):
+        user = serializer.save()
+        if 'password' in self.request.data and self.request.data['password']:
+            user.set_password(self.request.data['password'])
+            user.save()

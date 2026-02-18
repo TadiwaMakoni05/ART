@@ -1,0 +1,123 @@
+import React, { useEffect, useState } from "react";
+import api from "../services/api";
+import { Plus, Search, Phone, MessageSquare } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { AdherenceBadge } from "../components/AdherenceBadge";
+
+const ProviderPatients = () => {
+  const navigate = useNavigate();
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const res = await api.get("patients/");
+        setPatients(res.data);
+      } catch (error) {
+        console.error("Error fetching patients", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPatients();
+  }, []);
+
+  if (loading) return <div>Loading patients...</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-neutral-900">Patients</h2>
+          <p className="text-neutral-500">Manage your patient list</p>
+        </div>
+        <button
+          onClick={() => navigate("/provider/patients/new")}
+          className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" /> New Patient
+        </button>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm min-w-[600px]">
+            <thead className="bg-neutral-50 border-b border-neutral-200">
+              <tr>
+                <th className="px-6 py-3 font-medium text-neutral-500">Name</th>
+                <th className="px-6 py-3 font-medium text-neutral-500">
+                  Phone
+                </th>
+                <th className="px-6 py-3 font-medium text-neutral-500">
+                  Clinic ID
+                </th>
+                <th className="px-6 py-3 font-medium text-neutral-500">
+                  Adherence
+                </th>
+                <th className="px-6 py-3 font-medium text-neutral-500">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100">
+              {patients.map((patient) => (
+                <tr key={patient.id} className="hover:bg-neutral-50 transition">
+                  <td className="px-6 py-4 font-medium text-neutral-900">
+                    {patient.full_name}
+                  </td>
+                  <td className="px-6 py-4 text-neutral-600">
+                    {patient.phone}
+                  </td>
+                  <td className="px-6 py-4 text-neutral-600">
+                    {patient.clinic_id || "-"}
+                  </td>
+                  <td className="px-6 py-4">
+                    <AdherenceBadge score={patient.adherence_score} />
+                  </td>
+                  <td className="px-6 py-4 flex items-center gap-3">
+                    <a
+                      href={`tel:${patient.phone}`}
+                      className="p-2 text-neutral-500 hover:text-green-600 transition bg-neutral-100 rounded-full"
+                      title="Call"
+                    >
+                      <Phone className="w-4 h-4" />
+                    </a>
+                    <button
+                      onClick={() => navigate("/provider/messages")}
+                      className="p-2 text-neutral-500 hover:text-blue-600 transition bg-neutral-100 rounded-full"
+                      title="Message"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        navigate(`/provider/patients/${patient.id}`)
+                      }
+                      className="p-2 text-neutral-500 hover:text-black transition bg-neutral-100 rounded-full"
+                      title="View Profile"
+                    >
+                      <Search className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {patients.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="px-6 py-8 text-center text-neutral-500"
+                  >
+                    No patients found. Create one to get started.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProviderPatients;
