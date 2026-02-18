@@ -208,6 +208,7 @@ const PatientHome = () => {
           <h1 className="text-xl font-bold tracking-tight text-white">
             ART Companion
           </h1>
+          <p className="text-sm text-white mx-12">Welcome back,<b> {user?.full_name.toUpperCase() || user?.username.toUpperCase()}</b>!</p>
         </div>
 
         <div className="flex items-center gap-4">
@@ -238,7 +239,7 @@ const PatientHome = () => {
 
       <main className="p-4 max-w-lg mx-auto space-y-6">
         {/* Gamification Header Widget */}
-        <div className="bg-gradient-to-br from-indigo-900 to-neutral-900 rounded-2xl p-6 ring-1 ring-white/10 relative overflow-hidden">
+        <div className="bg-gradient-to-br bg-white  rounded-2xl p-6 ring-1 ring-black relative overflow-hidden">
           {showAnimation && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20 animate-in fade-in zoom-in duration-300">
               <div className="text-center">
@@ -251,22 +252,22 @@ const PatientHome = () => {
           )}
           <div className="flex justify-between items-start relative z-10">
             <div>
-              <p className="text-indigo-300 text-sm font-medium mb-1">
+              <p className="text-black text-sm font-medium mb-1">
                 Current Streak
               </p>
               <div className="flex items-baseline gap-2">
-                <h2 className="text-4xl font-bold text-white flex items-center gap-2">
+                <h2 className="text-4xl font-bold text-black flex items-center gap-2">
                   {gamification.current_streak}{" "}
                   <Zap className="w-6 h-6 text-yellow-500 fill-yellow-500" />
                 </h2>
-                <span className="text-sm text-neutral-400">days</span>
+                <span className="text-sm text-black">days</span>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-indigo-300 text-sm font-medium mb-1">
+              <p className="text-black text-sm font-medium mb-1">
                 Total Points
               </p>
-              <div className="text-2xl font-bold text-white flex items-center justify-end gap-2">
+              <div className="text-2xl font-bold text-black flex items-center justify-end gap-2">
                 {gamification.total_points}{" "}
                 <Award className="w-5 h-5 text-purple-400" />
               </div>
@@ -274,8 +275,8 @@ const PatientHome = () => {
           </div>
 
           <div className="mt-6">
-            <div className="flex justify-between text-xs text-indigo-300 mb-2">
-              <span>Weekly Progress</span>
+            <div className="flex justify-between text-xs text-black mb-2">
+              <span className="text-black">Weekly Progress</span>
               <span>
                 {gamification.current_streak > 0 ? "On Fire!" : "Keep going!"}
               </span>
