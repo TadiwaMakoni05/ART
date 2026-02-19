@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import toast from "react-hot-toast";
 import {
   Search,
   Plus,
@@ -10,6 +11,7 @@ import {
   Loader,
   Filter,
 } from "lucide-react";
+import ConfirmModal from "../components/ConfirmModal";
 
 const AdminUsers = ({ role }) => {
   // role = 'patient' or 'provider'
@@ -72,19 +74,33 @@ const AdminUsers = ({ role }) => {
       }
       setIsModalOpen(false);
       fetchUsers();
+      toast.success(
+        currentUser ? "User updated successfully" : "User created successfully",
+      );
     } catch (error) {
       console.error("Failed to save user", error);
-      alert("Error saving user. Please check inputs.");
+      toast.error("Error saving user. Please check inputs.");
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const confirmDelete = (user) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!userToDelete) return;
     try {
-      await api.delete(`admin/users/${id}/`);
+      await api.delete(`admin/users/${userToDelete.id}/`);
       fetchUsers();
+      toast.success("User deleted");
+      setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Failed to delete user", error);
+      toast.error("Failed to delete user");
     }
   };
 
@@ -116,6 +132,15 @@ const AdminUsers = ({ role }) => {
 
   return (
     <div className="space-y-6">
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title={`Delete ${role === "patient" ? "Patient" : "Provider"}`}
+        message={`Are you sure you want to delete this ${role}? This action cannot be undone.`}
+        isDanger={true}
+      />
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold capitalize">{role}s Management</h1>
         <button
@@ -182,7 +207,7 @@ const AdminUsers = ({ role }) => {
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={() => handleDelete(user.id)}
+                      onClick={() => confirmDelete(user)}
                       className="p-2 text-neutral-500 hover:text-red-600 bg-neutral-100  transition"
                       title="Delete"
                     >
@@ -239,7 +264,7 @@ const AdminUsers = ({ role }) => {
                 Edit
               </button>
               <button
-                onClick={() => handleDelete(user.id)}
+                onClick={() => confirmDelete(user)}
                 className="flex-1 py-2 text-center text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100"
               >
                 Delete

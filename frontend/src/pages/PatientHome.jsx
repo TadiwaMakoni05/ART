@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import api from "../services/api";
 import { useAuth } from "../context/useAuth";
 // import { saveOfflineLog } from "../services/offline";
+import toast from "react-hot-toast";
 import {
   Check,
   X,
@@ -32,7 +33,7 @@ const PatientHome = () => {
 
   // Audio for reminders
   const audioRef = useRef(
-    new Audio("/frontend/public/universfield-clean-mobile-tone-454836.mp3"),
+    new Audio("/universfield-clean-mobile-tone-454836.mp3"),
   );
   const [lastNotifiedTime, setLastNotifiedTime] = useState(null);
 
@@ -185,7 +186,7 @@ const PatientHome = () => {
       console.error("Error logging dose", error);
       // Save offline logic could be complex with PATCH vs POST, simplified for now
       // ... (omitted for brevity, or keep existing alert)
-      alert("Failed to save dose. Please try again.");
+      toast.error("Failed to save dose. Please try again.");
     }
   };
 

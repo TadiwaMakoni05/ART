@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+// import api from "../services/api";
 import { useAuth } from "../context/useAuth";
+import toast from "react-hot-toast";
 
 import {
   User,
@@ -65,19 +67,21 @@ const Settings = () => {
     }
   };
 
-  const handlePasswordUpdate = async (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
-    setLoading(true);
-    setSuccessMsg("");
+
     try {
       // Mock password update
+      // await api.post("auth/change-password/", {
+      //   old_password: passwordData.currentPassword,
+      //   new_password: passwordData.newPassword,
+      // });
       setTimeout(() => {
-        setSuccessMsg("Password changed successfully!");
-        setLoading(false);
+        toast.success("Password changed successfully");
         setPasswordData({
           currentPassword: "",
           newPassword: "",
@@ -85,8 +89,8 @@ const Settings = () => {
         });
       }, 1000);
     } catch (error) {
-      console.error("Failed to update password", error);
-      setLoading(false);
+      console.error("Error changing password", error);
+      toast.error("Failed to change password");
     }
   };
 
@@ -245,7 +249,7 @@ const Settings = () => {
           {/* SECURITY SECTION */}
           {activeTab === "security" && (
             <div className="space-y-8">
-              <form onSubmit={handlePasswordUpdate} className="space-y-6">
+              <form onSubmit={handlePasswordChange} className="space-y-6">
                 <h2 className="text-xl font-bold border-b pb-4 mb-6">
                   Change Password
                 </h2>

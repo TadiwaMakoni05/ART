@@ -263,6 +263,21 @@ class PrescriptionViewSet(viewsets.ModelViewSet):
                 return Prescription.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
         return Prescription.objects.none()
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role == 'provider':
+            patient_id = self.request.data.get('patient')
+            try:
+                patient = PatientProfile.objects.get(id=patient_id, provider_link__provider=user)
+                serializer.save(patient=patient)
+            except PatientProfile.DoesNotExist:
+                 raise serializers.ValidationError({"patient": "Invalid patient ID or not linked to you."})
+        elif user.role == 'patient':
+             # Patients shouldn't really self-prescribe in this model, but if allowed:
+             serializer.save(patient=user.patient_profile)
+        else:
+             raise serializers.ValidationError({"error": "Not authorized"})
+
 class MedicationViewSet(viewsets.ModelViewSet):
     serializer_class = MedicationScheduleSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -277,6 +292,20 @@ class MedicationViewSet(viewsets.ModelViewSet):
                 return MedicationSchedule.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
             return MedicationSchedule.objects.none()
         return MedicationSchedule.objects.none()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role == 'provider':
+            patient_id = self.request.data.get('patient')
+            try:
+                patient = PatientProfile.objects.get(id=patient_id, provider_link__provider=user)
+                serializer.save(patient=patient)
+            except PatientProfile.DoesNotExist:
+                 raise serializers.ValidationError({"patient": "Invalid patient ID or not linked to you."})
+        elif user.role == 'patient':
+             serializer.save(patient=user.patient_profile)
+        else:
+             raise serializers.ValidationError({"error": "Not authorized"})
 
 class AdherenceViewSet(viewsets.ModelViewSet):
     serializer_class = AdherenceLogSerializer
@@ -538,10 +567,20 @@ class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
         
         try:
             profile = user.patient_profile.gamification_profile
+            # Lazy check for badges
+            try:
+                from .utils import check_weekly_badges
+                check_weekly_badges(user.patient_profile)
+                # Reload profile to get updated points
+                profile.refresh_from_db()
+            except Exception as e:
+                print(f"Error checking badges: {e}")
+
         except (PatientProfile.DoesNotExist, PatientGamificationProfile.DoesNotExist):
              # Auto-create if missing (e.g. old patient)
             if hasattr(user, 'patient_profile'):
                 profile = PatientGamificationProfile.objects.create(patient=user.patient_profile)
+                # Also check badges on creation? Unlikely to have history, but no harm.
             else:
                 return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -556,6 +595,13 @@ class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
             
         try:
             patient = user.patient_profile
+            # Lazy check for badges
+            try:
+                from .utils import check_weekly_badges
+                check_weekly_badges(patient)
+            except Exception as e:
+                print(f"Error checking badges: {e}")
+
         except PatientProfile.DoesNotExist:
              return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
 

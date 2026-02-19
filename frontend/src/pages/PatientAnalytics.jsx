@@ -37,7 +37,7 @@ const PatientAnalytics = () => {
         setError(err.message || "An unknown error occurred");
         if (err.response) {
           setError(
-            `Error ${err.response.status}: ${JSON.stringify(err.response.data)}`
+            `Error ${err.response.status}: ${JSON.stringify(err.response.data)}`,
           );
         }
       } finally {
@@ -195,22 +195,23 @@ const PatientAnalytics = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 p-4 flex justify-around z-20 pb-safe">
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 p-4 flex justify-around z-20 pb-safe lg:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button
           onClick={() => navigate("/patient")}
-          className="text-neutral-500 hover:text-white flex flex-col items-center text-[10px] gap-1 transition"
+          className="text-neutral-400 hover:text-indigo-600 flex flex-col items-center text-[10px] gap-1 transition"
         >
           <ChevronRight className="w-6 h-6 rotate-180" /> Home
         </button>
         <button
           onClick={() => navigate("/patient/history")}
-          className="text-neutral-500 hover:text-white flex flex-col items-center text-[10px] gap-1 transition"
+          className="text-neutral-400 hover:text-indigo-600 flex flex-col items-center text-[10px] gap-1 transition"
         >
           <Clock className="w-6 h-6" /> History
         </button>
         <button
           onClick={() => navigate("/patient/analytics")}
-          className="text-white flex flex-col items-center text-[10px] gap-1 transition"
+          className="text-indigo-600 flex flex-col items-center text-[10px] gap-1 transition font-medium"
         >
           <BarChart2 className="w-6 h-6" /> Analytics
         </button>

@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   Shield,
+  Clock,
 } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 
@@ -40,6 +41,11 @@ const PatientLayout = () => {
       path: "/patient/analytics",
       label: "Analytics",
       icon: <BarChart2 size={20} />,
+    },
+    {
+      path: "/patient/history",
+      label: "History",
+      icon: <Clock size={20} />,
     },
     {
       path: "/messages",

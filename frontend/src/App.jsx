@@ -36,10 +36,13 @@ import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 
+import { Toaster } from "react-hot-toast";
+
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <Toaster position="top-center" reverseOrder={false} />
         <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans">
           <Routes>
             <Route path="/login" element={<Login />} />

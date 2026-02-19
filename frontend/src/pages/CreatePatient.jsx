@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   Mail,
   MessageSquare,
@@ -42,9 +43,10 @@ const CreatePatient = () => {
     try {
       const res = await api.post("patients/", { ...formData, regimen });
       setCreatedPatient(res.data);
+      toast.success("Patient account created successfully");
     } catch (error) {
       console.error(error);
-      alert("Error creating patient");
+      toast.error("Error creating patient");
     } finally {
       setLoading(false);
     }
@@ -61,9 +63,7 @@ const CreatePatient = () => {
       /[^0-9]/g,
       "",
     )}?text=${encodeURIComponent(messageBody)}`;
-    const mailtoSmS = `sms:${phone}?body=${encodeURIComponent(
-      messageBody,
-    )}`;
+    const mailtoSmS = `sms:${phone}?body=${encodeURIComponent(messageBody)}`;
     const telLink = `tel:${phone}`;
 
     const copyAll = () =>
