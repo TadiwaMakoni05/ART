@@ -9,7 +9,7 @@ from .views import (
     ProviderDashboardView, SyncDataView, ChatbotView,
     MyTokenObtainPairView, GamificationViewSet, QuoteView, AnalyticsView,
     AdminDashboardView, AdminUserViewSet, ProviderViewSet, MessageViewSet,
-    PrescriptionViewSet, ViralLoadResultViewSet
+    PrescriptionViewSet, ViralLoadResultViewSet, DownloadReportView
 )
 
 router = DefaultRouter()
@@ -34,6 +34,8 @@ urlpatterns = [
     path('learn/home-quotes/', QuoteView.as_view(), name='home-quotes'),
     path('patients/me/analytics/', AnalyticsView.as_view(), name='patient-analytics'),
     path('admin/dashboard/', AdminDashboardView.as_view(), name='admin-dashboard'),
+    
+    path('reports/<int:pk>/download/', DownloadReportView.as_view(), name='download-report'),
     
     path('', include(router.urls)),
 ]

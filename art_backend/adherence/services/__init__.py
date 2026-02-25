@@ -1,6 +1,6 @@
 import datetime
 from django.utils import timezone
-from .models import SystemSettings, ViralLoadResult, ViralLoadReview, AdherenceLog
+from ..models import SystemSettings, ViralLoadResult, ViralLoadReview, AdherenceLog
 
 def generate_viral_load_review(viral_load_result_id):
     try:

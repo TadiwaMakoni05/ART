@@ -116,13 +116,34 @@ class AdherenceLog(models.Model):
     def __str__(self):
         return f"{self.patient} - {self.medication.medication_name} - {self.status}"
 
+class ReportFile(models.Model):
+    REPORT_TYPES = (
+        ('adherence_report', 'Adherence Report'),
+        ('viral_load_report', 'Viral Load Report'),
+    )
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name='reports')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='generated_reports')
+    file = models.FileField(upload_to='reports/')
+    report_type = models.CharField(max_length=50, choices=REPORT_TYPES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_report_type_display()} for {self.patient} at {self.created_at}"
+
 class CounselingMessage(models.Model):
+    MESSAGE_TYPES = (
+        ('text', 'Text'),
+        ('adherence_report', 'Adherence Report'),
+        ('viral_load_report', 'Viral Load Report'),
+    )
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')
     message = models.TextField(blank=True)
     image = models.ImageField(upload_to='chat_images/', null=True, blank=True)
     is_read = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+    message_type = models.CharField(max_length=50, choices=MESSAGE_TYPES, default='text')
+    attachment = models.ForeignKey(ReportFile, on_delete=models.SET_NULL, null=True, blank=True, related_name='attached_to_messages')
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"

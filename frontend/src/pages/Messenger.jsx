@@ -2,8 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/useAuth";
+import ReactMarkdown from "react-markdown";
 import { saveOfflineMessage } from "../services/offline";
-import { Send, Image, MoreVertical, Phone, X, ArrowLeft } from "lucide-react";
+import {
+  Send,
+  Image,
+  MoreVertical,
+  Phone,
+  X,
+  ArrowLeft,
+  FileText,
+  Download,
+} from "lucide-react";
 
 const Messenger = () => {
   const navigate = useNavigate();
@@ -116,6 +126,7 @@ const Messenger = () => {
           setConversations(
             res.data.map((p) => ({
               id: p.user.id,
+              patientId: p.id,
               name: p.full_name,
               role: "Patient",
               lastSeen: p.user.last_seen,
@@ -194,6 +205,24 @@ const Messenger = () => {
         setAllMessages([...allMessages, uiMsg]);
         setNewMessage("");
       }
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    if (!activeConversation || !activeConversation.patientId) return;
+    try {
+      await api.post(
+        `patients/${activeConversation.patientId}/adherence-report/`,
+      );
+      alert(
+        "Report generation started. It will appear in the chat momentarily.",
+      );
+    } catch (error) {
+      console.error("Failed to generate report", error);
+      alert(
+        "Failed to generate report: " +
+          (error.response?.data?.error || error.message),
+      );
     }
   };
 
@@ -288,7 +317,16 @@ const Messenger = () => {
                 </button>
                 <h2 className="font-bold">{activeConversation.name}</h2>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                {user.role === "provider" &&
+                  activeConversation.role === "Patient" && (
+                    <button
+                      onClick={handleGenerateReport}
+                      className="text-xs mr-2 px-3 py-1.5 bg-neutral-100 font-semibold border border-neutral-300 hover:bg-neutral-200 transition"
+                    >
+                      Generate adherence report
+                    </button>
+                  )}
                 {activeConversation.phone && (
                   <a
                     href={`tel:${activeConversation.phone}`}
@@ -326,7 +364,17 @@ const Messenger = () => {
                           onClick={() => setSelectedImage(msg.image)}
                         />
                       )}
-                      <p>{msg.message}</p>
+                      {msg.message_type === "adherence_report" ||
+                      msg.message_type === "viral_load_report" ? (
+                        <div
+                          className={`p-4 mt-1 rounded-md text-sm prose prose-sm max-w-none ${isMe ? "bg-black/20 text-white prose-invert" : "bg-neutral-100 text-black"} [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-5 [&>h3]:text-base [&>h3]:font-bold [&>h3]:mb-2`}
+                        >
+                          <ReactMarkdown>{msg.message}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-wrap">{msg.message}</p>
+                      )}
+
                       <div
                         className={`text-[10px] mt-1 text-right ${isMe ? "text-neutral-400" : "text-neutral-400"}`}
                       >

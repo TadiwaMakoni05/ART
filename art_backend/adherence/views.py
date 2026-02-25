@@ -251,6 +251,31 @@ class PatientViewSet(viewsets.ModelViewSet):
             }
         }, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['post'], url_path='adherence-report')
+    def adherence_report(self, request, pk=None):
+        if request.user.role != 'provider':
+             return Response({"error": "Only providers can generate adherence reports"}, status=status.HTTP_403_FORBIDDEN)
+             
+        patient_profile = self.get_object()
+        
+        # Verify relation
+        if not ProviderPatientLink.objects.filter(provider=request.user, patient=patient_profile).exists():
+             return Response({"error": "Not authorized for this patient"}, status=status.HTTP_403_FORBIDDEN)
+             
+        # Generate the report
+        from .services.reports import generate_adherence_report
+        report_text = generate_adherence_report(patient_profile.id, request.user.id)
+        
+        # Create CounselingMessage
+        message = CounselingMessage.objects.create(
+            sender=request.user,
+            receiver=patient_profile.user,
+            message=report_text,
+            message_type='adherence_report'
+        )
+        
+        return Response({"status": "Adherence report generated and sent.", "message_id": message.id}, status=status.HTTP_201_CREATED)
+
 class PrescriptionViewSet(viewsets.ModelViewSet):
     serializer_class = PrescriptionSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -347,7 +372,21 @@ class ViralLoadResultViewSet(viewsets.ModelViewSet):
             # Save the result
             instance = serializer.save(patient=patient, entered_by=user)
             # Generate the review
+            from .services import generate_viral_load_review
             generate_viral_load_review(instance.id)
+            
+            # Generate Viral Load Report
+            from .services.reports import generate_viral_load_report
+            report_text = generate_viral_load_report(instance.id)
+            
+            # Auto-create chat message
+            CounselingMessage.objects.create(
+                sender=user,
+                receiver=patient.user,
+                message=report_text,
+                message_type='viral_load_report'
+            )
+
             # Refetch to get the related review in the return response
             instance.refresh_from_db()
 
@@ -776,3 +815,29 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         if 'password' in self.request.data and self.request.data['password']:
             user.set_password(self.request.data['password'])
             user.save()
+
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+from .models import ReportFile
+
+class DownloadReportView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        report = get_object_or_404(ReportFile, pk=pk)
+        
+        user = request.user
+        has_permission = False
+        
+        if user.role == 'patient' and report.patient.user == user:
+            has_permission = True
+        elif user.role == 'provider':
+             if ProviderPatientLink.objects.filter(provider=user, patient=report.patient).exists():
+                 has_permission = True
+        elif user.role == 'admin':
+            has_permission = True
+            
+        if not has_permission:
+            return Response({"error": "You do not have permission to view this report"}, status=status.HTTP_403_FORBIDDEN)
+            
+        return FileResponse(report.file.open('rb'), as_attachment=True, filename=report.file.name.split('/')[-1])

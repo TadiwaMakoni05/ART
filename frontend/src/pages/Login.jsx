@@ -67,9 +67,15 @@ const Login = () => {
             Sign In
           </button>
         </form>
-        <p className="text-xs text-center text-neutral-500">
-          Secure Healthcare System
-        </p>
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="text-xs text-neutral-500 hover:underline"
+          >
+            Secure Healthcare System
+          </button>
+        </div>
       </div>
     </div>
   );

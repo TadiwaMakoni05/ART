@@ -4,7 +4,7 @@ from .models import (
     User, PatientProfile, MedicationSchedule, AdherenceLog, ProviderPatientLink,
     CounselingMessage, PatientGamificationProfile, PointTransaction, WeeklyConsistencyBadge,
     Badge, RefillReminder, Alert, AuditLog, Quote, Prescription,
-    ViralLoadResult, ViralLoadReview
+    ViralLoadResult, ViralLoadReview, ReportFile
 )
 
 # ... (rest of imports)
@@ -118,12 +118,18 @@ class AdherenceLogSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['created_at'] # Patient set in view
 
+class ReportFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportFile
+        fields = '__all__'
+
 class CounselingMessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
     receiver = UserSerializer(read_only=True)
     receiver_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='receiver', write_only=True
     )
+    attachment_details = ReportFileSerializer(source='attachment', read_only=True)
 
     class Meta:
         model = CounselingMessage
