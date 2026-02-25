@@ -19,6 +19,7 @@ const PatientDetail = () => {
   const [patient, setPatient] = useState(null);
   const [regimen, setRegimen] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [viralLoads, setViralLoads] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Edit Profile State
@@ -139,6 +140,83 @@ const PatientDetail = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [medToDelete, setMedToDelete] = useState(null);
 
+  // Viral Load CRUD State
+  const [isVlModalOpen, setIsVlModalOpen] = useState(false);
+  const [editingVlId, setEditingVlId] = useState(null);
+  const [vlFormData, setVlFormData] = useState({
+    test_date: "",
+    viral_load_value: "",
+    review_date: "",
+  });
+  const [isDeleteVlModalOpen, setIsDeleteVlModalOpen] = useState(false);
+  const [vlToDelete, setVlToDelete] = useState(null);
+
+  const openAddVlModal = () => {
+    setEditingVlId(null);
+    setVlFormData({
+      test_date: new Date().toISOString().split("T")[0],
+      viral_load_value: "",
+      review_date: "",
+    });
+    setIsVlModalOpen(true);
+  };
+
+  const openEditVlModal = (vl) => {
+    setEditingVlId(vl.id);
+    setVlFormData({
+      test_date: vl.test_date,
+      viral_load_value: vl.viral_load_value,
+      review_date: vl.review_date || "",
+    });
+    setIsVlModalOpen(true);
+  };
+
+  const handleSaveVl = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        patient: id,
+        test_date: vlFormData.test_date,
+        viral_load_value: parseInt(vlFormData.viral_load_value),
+        review_date: vlFormData.review_date || null,
+      };
+
+      if (editingVlId) {
+        await api.patch(`viral-loads/${editingVlId}/`, payload);
+        toast.success("Viral load updated");
+      } else {
+        await api.post("viral-loads/", payload);
+        toast.success("Viral load added");
+      }
+
+      const vRes = await api.get(`viral-loads/?patient=${id}`);
+      setViralLoads(vRes.data);
+      setIsVlModalOpen(false);
+    } catch (error) {
+      console.error("Error saving viral load", error);
+      toast.error(error.response?.data?.error || "Failed to save viral load");
+    }
+  };
+
+  const confirmDeleteVl = (vlId) => {
+    setVlToDelete(vlId);
+    setIsDeleteVlModalOpen(true);
+  };
+
+  const handleDeleteVl = async () => {
+    if (!vlToDelete) return;
+    try {
+      await api.delete(`viral-loads/${vlToDelete}/`);
+      const vRes = await api.get(`viral-loads/?patient=${id}`);
+      setViralLoads(vRes.data);
+      toast.success("Viral load removed");
+      setIsDeleteVlModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting viral load", error);
+      toast.error("Failed to delete viral load");
+    }
+  };
+
   const confirmDeleteMedication = (medId) => {
     setMedToDelete(medId);
     setIsDeleteModalOpen(true);
@@ -170,6 +248,9 @@ const PatientDetail = () => {
 
         const lRes = await api.get(`adherence/?patient_id=${id}`);
         setLogs(lRes.data);
+
+        const vRes = await api.get(`viral-loads/?patient=${id}`);
+        setViralLoads(vRes.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -179,8 +260,28 @@ const PatientDetail = () => {
     fetchPatient();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
-  if (!patient) return <div>Patient not found</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral-50 p-8">
+        <div className="max-w-6xl mx-auto space-y-8 animate-pulse">
+          <div className="h-4 bg-neutral-200 rounded w-32"></div>
+          <div className="bg-white shadow-sm border border-neutral-200 p-8 flex flex-col gap-4">
+            <div className="h-8 bg-neutral-200 rounded w-1/3"></div>
+            <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white shadow-sm border border-neutral-200 p-6 h-64"></div>
+            <div className="bg-white shadow-sm border border-neutral-200 p-6 h-64"></div>
+            <div className="bg-white shadow-sm border border-neutral-200 p-6 h-64"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (!patient)
+    return (
+      <div className="p-8 text-center text-neutral-500">Patient not found</div>
+    );
 
   // Calculate Adherence Stats
   const takenCount = logs.filter((l) => l.status === "taken").length;
@@ -563,8 +664,177 @@ const PatientDetail = () => {
               )}
             </ul>
           </div>
+
+          {/* Viral Load & Reviews Column */}
+          <div className="bg-white shadow-sm border border-neutral-200 p-6 lg:col-span-3">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Viral Load & Reviews</h2>
+              <button
+                onClick={openAddVlModal}
+                className="text-xs bg-black text-white px-3 py-1.5 flex items-center gap-1 hover:bg-neutral-800"
+              >
+                <Plus className="w-3 h-3" /> Add Result
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left text-neutral-500">
+                <thead className="text-xs text-neutral-700 uppercase bg-neutral-50">
+                  <tr>
+                    <th className="px-4 py-3">Test Date</th>
+                    <th className="px-4 py-3">Viral Load</th>
+                    <th className="px-4 py-3">Review Date</th>
+                    <th className="px-4 py-3">Entered By</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {viralLoads.map((vl) => (
+                    <tr key={vl.id} className="border-b">
+                      <td className="px-4 py-3 font-medium text-neutral-900">
+                        {vl.test_date}
+                      </td>
+                      <td className="px-4 py-3">{vl.viral_load_value}</td>
+                      <td className="px-4 py-3">
+                        {vl.review_date || "Not set"}
+                      </td>
+                      <td className="px-4 py-3">User #{vl.entered_by}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => openEditVlModal(vl)}
+                            className="text-neutral-400 hover:text-black transition"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => confirmDeleteVl(vl.id)}
+                            className="p-1 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded transition"
+                            title="Delete"
+                          >
+                            <Trash className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {viralLoads.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-4 py-8 text-center text-neutral-500"
+                      >
+                        No viral load records found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Viral Load Modal */}
+      {isVlModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-6 w-full max-w-md shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">
+                {editingVlId
+                  ? "Edit Viral Load Record"
+                  : "Add Viral Load Record"}
+              </h3>
+              <button
+                onClick={() => setIsVlModalOpen(false)}
+                className="text-neutral-400 hover:text-black"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveVl} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700">
+                  Test Date
+                </label>
+                <input
+                  type="date"
+                  value={vlFormData.test_date}
+                  onChange={(e) =>
+                    setVlFormData({ ...vlFormData, test_date: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-neutral-300 px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700">
+                  Viral Load Value
+                </label>
+                <input
+                  type="number"
+                  value={vlFormData.viral_load_value}
+                  onChange={(e) =>
+                    setVlFormData({
+                      ...vlFormData,
+                      viral_load_value: e.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full border border-neutral-300 px-3 py-2"
+                  min="0"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700">
+                  Review Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={vlFormData.review_date}
+                  onChange={(e) =>
+                    setVlFormData({
+                      ...vlFormData,
+                      review_date: e.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsVlModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-black hover:bg-neutral-800 flex items-center gap-2"
+                >
+                  {editingVlId ? (
+                    <Save className="w-4 h-4" />
+                  ) : (
+                    <Plus className="w-4 h-4" />
+                  )}
+                  {editingVlId ? "Save Changes" : "Save Record"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Viral Load Confirm Modal */}
+      <ConfirmModal
+        isOpen={isDeleteVlModalOpen}
+        onClose={() => setIsDeleteVlModalOpen(false)}
+        onConfirm={handleDeleteVl}
+        title="Delete Viral Load Record"
+        message="Are you sure you want to delete this viral load record? This action cannot be undone."
+        isDanger={true}
+      />
     </div>
   );
 };

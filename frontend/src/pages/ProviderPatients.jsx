@@ -23,7 +23,21 @@ const ProviderPatients = () => {
     fetchPatients();
   }, []);
 
-  if (loading) return <div>Loading patients...</div>;
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse p-4 md:p-8">
+        <div className="flex justify-between items-center">
+          <div className="h-8 bg-neutral-200 rounded w-1/4"></div>
+          <div className="h-10 bg-neutral-200 rounded w-32"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-32 bg-neutral-200 rounded w-full"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -51,9 +65,6 @@ const ProviderPatients = () => {
                   Phone
                 </th>
                 <th className="px-6 py-3 font-medium text-neutral-500">
-                  Clinic ID
-                </th>
-                <th className="px-6 py-3 font-medium text-neutral-500">
                   Adherence
                 </th>
                 <th className="px-6 py-3 font-medium text-neutral-500">
@@ -69,9 +80,6 @@ const ProviderPatients = () => {
                   </td>
                   <td className="px-6 py-4 text-neutral-600">
                     {patient.phone}
-                  </td>
-                  <td className="px-6 py-4 text-neutral-600">
-                    {patient.clinic_id || "-"}
                   </td>
                   <td className="px-6 py-4">
                     <AdherenceBadge score={patient.adherence_score} />
@@ -130,9 +138,6 @@ const ProviderPatients = () => {
                 <h3 className="font-bold text-neutral-900">
                   {patient.full_name}
                 </h3>
-                <p className="text-sm text-neutral-500">
-                  {patient.clinic_id || "No ID"}
-                </p>
               </div>
               <AdherenceBadge score={patient.adherence_score} />
             </div>

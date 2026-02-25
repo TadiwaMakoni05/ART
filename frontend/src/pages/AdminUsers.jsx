@@ -128,7 +128,18 @@ const AdminUsers = ({ role }) => {
         u.full_name.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse p-4 md:p-8">
+        <div className="flex justify-between items-center">
+          <div className="h-8 bg-neutral-200 rounded w-1/4"></div>
+          <div className="h-10 bg-neutral-200 rounded w-24"></div>
+        </div>
+        <div className="h-12 bg-neutral-200 rounded w-full"></div>
+        <div className="h-64 bg-neutral-200 rounded w-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

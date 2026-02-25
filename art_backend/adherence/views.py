@@ -7,15 +7,17 @@ import datetime
 
 from .models import (
     User, PatientProfile, MedicationSchedule, AdherenceLog, ProviderPatientLink, Alert, CounselingMessage,
-    PointTransaction, WeeklyConsistencyBadge, Quote, Prescription
+    PointTransaction, WeeklyConsistencyBadge, Quote, Prescription, ViralLoadResult, ViralLoadReview,
+    PatientGamificationProfile
 )
 from .serializers import (
     UserSerializer, PatientProfileSerializer, MedicationScheduleSerializer,
     AdherenceLogSerializer, CreatePatientSerializer, DashboardMetricsSerializer,
     CounselingMessageSerializer, MyTokenObtainPairSerializer,
     PatientGamificationProfileSerializer, PointTransactionSerializer, WeeklyConsistencyBadgeSerializer,
-    QuoteSerializer, PrescriptionSerializer
+    QuoteSerializer, PrescriptionSerializer, ViralLoadResultSerializer
 )
+from .services import generate_viral_load_review
 
 class QuoteView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -258,9 +260,13 @@ class PrescriptionViewSet(viewsets.ModelViewSet):
         if user.role == 'patient':
             return Prescription.objects.filter(patient__user=user)
         elif user.role == 'provider':
-            patient_id = self.request.query_params.get('patient_id')
-            if patient_id:
-                return Prescription.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
+            qs = Prescription.objects.filter(patient__provider_link__provider=user)
+            if getattr(self, 'action', None) == 'list':
+                patient_id = self.request.query_params.get('patient_id')
+                if patient_id:
+                    return qs.filter(patient_id=patient_id)
+                return qs.none()
+            return qs
         return Prescription.objects.none()
 
     def perform_create(self, serializer):
@@ -287,10 +293,13 @@ class MedicationViewSet(viewsets.ModelViewSet):
         if user.role == 'patient':
             return MedicationSchedule.objects.filter(patient__user=user)
         elif user.role == 'provider':
-            patient_id = self.request.query_params.get('patient_id')
-            if patient_id:
-                return MedicationSchedule.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
-            return MedicationSchedule.objects.none()
+            qs = MedicationSchedule.objects.filter(patient__provider_link__provider=user)
+            if getattr(self, 'action', None) == 'list':
+                patient_id = self.request.query_params.get('patient_id')
+                if patient_id:
+                    return qs.filter(patient_id=patient_id)
+                return qs.none()
+            return qs
         return MedicationSchedule.objects.none()
 
     def perform_create(self, serializer):
@@ -306,6 +315,44 @@ class MedicationViewSet(viewsets.ModelViewSet):
              serializer.save(patient=user.patient_profile)
         else:
              raise serializers.ValidationError({"error": "Not authorized"})
+
+class ViralLoadResultViewSet(viewsets.ModelViewSet):
+    serializer_class = ViralLoadResultSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        
+        if user.role == 'patient':
+            return ViralLoadResult.objects.filter(patient__user=user)
+
+        if user.role == 'provider':
+            qs = ViralLoadResult.objects.filter(patient__provider_link__provider=user)
+        if getattr(self, 'action', None) == 'list':
+            patient_id = self.request.query_params.get('patient') or self.request.query_params.get('patient_id')
+            if patient_id:
+                return qs.filter(patient_id=patient_id)
+            return qs.none()
+        return qs
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role != 'provider':
+             raise serializers.ValidationError({"error": "Only clinic staff (providers) can enter viral load results."})
+
+        # the body must have `patient` ID
+        patient_id = self.request.data.get('patient')
+        try:
+            patient = PatientProfile.objects.get(id=patient_id, provider_link__provider=user)
+            # Save the result
+            instance = serializer.save(patient=patient, entered_by=user)
+            # Generate the review
+            generate_viral_load_review(instance.id)
+            # Refetch to get the related review in the return response
+            instance.refresh_from_db()
+
+        except PatientProfile.DoesNotExist:
+             raise serializers.ValidationError({"patient": "Invalid patient ID or not linked to you."})
 
 class AdherenceViewSet(viewsets.ModelViewSet):
     serializer_class = AdherenceLogSerializer
@@ -350,9 +397,12 @@ class AdherenceViewSet(viewsets.ModelViewSet):
 
             queryset = AdherenceLog.objects.filter(patient__user=user)
         elif user.role == 'provider':
+            qs = AdherenceLog.objects.filter(patient__provider_link__provider=user)
             patient_id = self.request.query_params.get('patient_id')
-            if patient_id:
-                 queryset = AdherenceLog.objects.filter(patient_id=patient_id, patient__provider_link__provider=user)
+            if patient_id and getattr(self, 'action', None) == 'list':
+                queryset = qs.filter(patient_id=patient_id)
+            else:
+                queryset = qs
         
         if start_date_str:
             queryset = queryset.filter(scheduled_time__date__gte=start_date_str)
@@ -375,13 +425,63 @@ class AdherenceViewSet(viewsets.ModelViewSet):
         data = request.data.copy()
         data['patient'] = patient.id
         
-        # Check if log exists (deduplication handled by uniqueness constraint usually, but we can check here)
-        # Let the serializer handle validation or DB constraint error
+        # Enforce time window for "taken" status
+        if data.get('status') == 'taken':
+            scheduled_time_str = data.get('scheduled_time')
+            if not scheduled_time_str:
+                return Response({"error": "scheduled_time is required"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            try:
+                # Handle possible formats (ISO from frontend)
+                if 'Z' in scheduled_time_str:
+                    scheduled_time_str = scheduled_time_str.replace('Z', '+00:00')
+                scheduled_time = datetime.datetime.fromisoformat(scheduled_time_str)
+                if timezone.is_naive(scheduled_time):
+                    scheduled_time = timezone.make_aware(scheduled_time)
+            except ValueError:
+                return Response({"error": "Invalid scheduled_time format"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            from .models import SystemSettings
+            settings_obj = SystemSettings.load()
+            
+            now = timezone.now()
+            lower_bound = scheduled_time - datetime.timedelta(hours=settings_obj.adherence_window_before_hours)
+            upper_bound = scheduled_time + datetime.timedelta(hours=settings_obj.adherence_window_after_hours)
+            
+            if now < lower_bound or now > upper_bound:
+                return Response({
+                    "error": f"You can only mark a dose as taken within {settings_obj.adherence_window_before_hours} hour(s) before and {settings_obj.adherence_window_after_hours} hour(s) after the scheduled time."
+                }, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        # Enforce time window for "taken" status
+        if request.data.get('status') == 'taken':
+            scheduled_time = instance.scheduled_time
+            
+            from .models import SystemSettings
+            settings_obj = SystemSettings.load()
+            
+            now = timezone.now()
+            lower_bound = scheduled_time - datetime.timedelta(hours=settings_obj.adherence_window_before_hours)
+            upper_bound = scheduled_time + datetime.timedelta(hours=settings_obj.adherence_window_after_hours)
+            
+            if now < lower_bound or now > upper_bound:
+                return Response({
+                    "error": f"You can only mark a dose as taken within {settings_obj.adherence_window_before_hours} hour(s) before and {settings_obj.adherence_window_after_hours} hour(s) after the scheduled time."
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 class ProviderDashboardView(views.APIView):
     permission_classes = [IsProvider]

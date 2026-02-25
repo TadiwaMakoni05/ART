@@ -25,6 +25,11 @@ class PatientProfile(models.Model):
     gender = models.CharField(max_length=20, blank=True)
     clinic_id = models.CharField(max_length=50, blank=True)
     consent_flags = models.JSONField(default=dict)
+    
+    # Notification Preferences
+    email_notifs = models.BooleanField(default=True)
+    push_notifs = models.BooleanField(default=True)
+    whatsapp_notifs = models.BooleanField(default=False)
 
     def __str__(self):
         return self.full_name
@@ -49,9 +54,9 @@ class Prescription(models.Model):
     total_pills = models.IntegerField(default=30)
     current_pills = models.IntegerField(default=30)
     
-    start_date = models.DateField(default=timezone.now)
-    end_date = models.DateField(null=True, blank=True)
-    review_date = models.DateField(null=True, blank=True)
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField(null=True, blank=True)
+    review_date = models.DateTimeField(null=True, blank=True)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -226,3 +231,71 @@ class Quote(models.Model):
         return f"{self.category}: {self.text[:50]}..."
 
 
+class SystemSettings(models.Model):
+    # Singleton model
+    adherence_window_before_hours = models.FloatField(default=1.0, help_text="Hours before scheduled time a dose can be marked taken")
+    adherence_window_after_hours = models.FloatField(default=1.0, help_text="Hours after scheduled time a dose can be marked taken")
+    
+    vl_suppression_threshold = models.IntegerField(default=1000, help_text="Viral load value threshold for suppression")
+    adherence_high_threshold = models.FloatField(default=90.0, help_text="Percentage threshold for high adherence")
+    vl_review_window_days = models.IntegerField(default=60, help_text="Days to look back for adherence review")
+    
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(SystemSettings, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self):
+        return "System Settings"
+
+
+class ViralLoadResult(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name='viral_load_results')
+    test_date = models.DateField()
+    viral_load_value = models.IntegerField()
+    review_date = models.DateField(null=True, blank=True)
+    entered_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='entered_viral_loads')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"VL {self.viral_load_value} on {self.test_date} for {self.patient}"
+
+
+class ViralLoadReview(models.Model):
+    STATUS_CHOICES = (
+        ('CONSISTENT_AND_CONTROLLED', 'Consistent and Controlled'),
+        ('LIKELY_NON_ADHERENCE', 'Likely Non-Adherence'),
+        ('POSSIBLE_REPORTING_OR_TREATMENT_ISSUE', 'Possible Reporting or Treatment Issue'),
+        ('SHORT_TERM_NON_ADHERENCE', 'Short-Term Non-Adherence'),
+        ('PENDING', 'Pending'),
+    )
+
+    viral_load_result = models.OneToOneField(ViralLoadResult, on_delete=models.CASCADE, related_name='review')
+    review_start_date = models.DateField()
+    review_end_date = models.DateField()
+    
+    adherence_percentage = models.FloatField(default=0.0)
+    missed_doses = models.IntegerField(default=0)
+    late_doses = models.IntegerField(default=0)
+    
+    flagged_logs = models.JSONField(default=list, blank=True)
+    review_status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='PENDING')
+    generated_at = models.DateTimeField(auto_now_add=True)
+
+    def generate_interpretation(self):
+        if self.review_status == 'CONSISTENT_AND_CONTROLLED':
+            return "Viral load suppressed with high reported adherence – excellent control."
+        elif self.review_status == 'LIKELY_NON_ADHERENCE':
+            return "Viral load not suppressed with low reported adherence – focus on adherence support."
+        elif self.review_status == 'POSSIBLE_REPORTING_OR_TREATMENT_ISSUE':
+            return "Viral load not suppressed with high reported adherence – investigate reliability or regimen."
+        elif self.review_status == 'SHORT_TERM_NON_ADHERENCE':
+            return "Viral load suppressed with low adherence – likely short-term missed doses, monitor closely."
+        return "Review pending..."
+
+    def __str__(self):
+        return f"Review for {self.viral_load_result} - {self.review_status}"

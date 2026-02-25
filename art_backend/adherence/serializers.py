@@ -3,7 +3,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     User, PatientProfile, MedicationSchedule, AdherenceLog, ProviderPatientLink,
     CounselingMessage, PatientGamificationProfile, PointTransaction, WeeklyConsistencyBadge,
-    Badge, RefillReminder, Alert, AuditLog, Quote, Prescription
+    Badge, RefillReminder, Alert, AuditLog, Quote, Prescription,
+    ViralLoadResult, ViralLoadReview
 )
 
 # ... (rest of imports)
@@ -68,7 +69,7 @@ class PatientProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = PatientProfile
-        fields = ['id', 'user', 'full_name', 'phone', 'dob', 'gender', 'clinic_id', 'consent_flags', 'adherence_score']
+        fields = ['id', 'user', 'full_name', 'phone', 'dob', 'gender', 'clinic_id', 'consent_flags', 'adherence_score', 'email_notifs', 'push_notifs', 'whatsapp_notifs']
 
     def get_adherence_score(self, obj):
         # Calculate score: taken / (taken + missed) * 100
@@ -81,10 +82,29 @@ class PatientProfileSerializer(serializers.ModelSerializer):
         return round((taken / total) * 100, 1)
 
 class PrescriptionSerializer(serializers.ModelSerializer):
+    start_date_only = serializers.SerializerMethodField()
+    end_date_only = serializers.SerializerMethodField()
+    review_date_only = serializers.SerializerMethodField()
+
     class Meta:
         model = Prescription
         fields = '__all__'
         read_only_fields = ['patient', 'current_pills'] # current_pills init same as total
+
+    def get_start_date_only(self, obj):
+        if obj.start_date:
+            return obj.start_date.date() if hasattr(obj.start_date, 'date') else obj.start_date
+        return None
+
+    def get_end_date_only(self, obj):
+        if obj.end_date:
+            return obj.end_date.date() if hasattr(obj.end_date, 'date') else obj.end_date
+        return None
+
+    def get_review_date_only(self, obj):
+        if obj.review_date:
+            return obj.review_date.date() if hasattr(obj.review_date, 'date') else obj.review_date
+        return None
 
 class MedicationScheduleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -157,5 +177,24 @@ class PatientGamificationProfileSerializer(serializers.ModelSerializer):
         if badge:
             return WeeklyConsistencyBadgeSerializer(badge).data
         return None
+
+class ViralLoadReviewSerializer(serializers.ModelSerializer):
+    interpretation = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ViralLoadReview
+        fields = '__all__'
+        
+    def get_interpretation(self, obj):
+        return obj.generate_interpretation()
+
+class ViralLoadResultSerializer(serializers.ModelSerializer):
+    review = ViralLoadReviewSerializer(read_only=True)
+    
+    class Meta:
+        model = ViralLoadResult
+        fields = '__all__'
+        read_only_fields = ['entered_by']
+
 
 

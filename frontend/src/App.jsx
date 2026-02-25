@@ -124,7 +124,13 @@ function App() {
 
 const RootRedirect = () => {
   const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="w-16 h-16 bg-neutral-200 rounded-full animate-pulse"></div>
+      </div>
+    );
+  }
   if (!user) return <Navigate to="/login" replace />;
 
   if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;

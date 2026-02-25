@@ -7,7 +7,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const location = useLocation();
 
   if (loading) {
-    return <div>Loading...</div>; // Or a specific loading spinner
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="w-16 h-16 bg-neutral-200 rounded-full animate-pulse"></div>
+      </div>
+    );
   }
 
   if (!user) {

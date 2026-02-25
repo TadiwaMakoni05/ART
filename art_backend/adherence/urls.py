@@ -9,7 +9,7 @@ from .views import (
     ProviderDashboardView, SyncDataView, ChatbotView,
     MyTokenObtainPairView, GamificationViewSet, QuoteView, AnalyticsView,
     AdminDashboardView, AdminUserViewSet, ProviderViewSet, MessageViewSet,
-    PrescriptionViewSet
+    PrescriptionViewSet, ViralLoadResultViewSet
 )
 
 router = DefaultRouter()
@@ -21,6 +21,7 @@ router.register(r'gamification', GamificationViewSet, basename='gamification')
 router.register(r'admin/users', AdminUserViewSet, basename='admin-users')
 router.register(r'providers-list', ProviderViewSet, basename='providers-list')
 router.register(r'messages', MessageViewSet, basename='messages')
+router.register(r'viral-loads', ViralLoadResultViewSet, basename='viral-loads')
 
 urlpatterns = [
     path('auth/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),

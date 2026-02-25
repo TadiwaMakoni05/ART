@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/useAuth";
 import { saveOfflineMessage } from "../services/offline";
 import { Send, Image, MoreVertical, Phone, X, ArrowLeft } from "lucide-react";
 
 const Messenger = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
@@ -203,7 +205,13 @@ const Messenger = () => {
           activeConversation ? "hidden md:flex" : "flex"
         }`}
       >
-        <div className="p-4 border-b border-neutral-200 font-bold text-lg">
+        <div className="p-4 border-b border-neutral-200 font-bold text-lg flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1 hover:bg-neutral-100 rounded"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           Messages
         </div>
         <div className="overflow-y-auto flex-1">

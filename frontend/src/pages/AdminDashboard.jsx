@@ -42,8 +42,22 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
-  if (loading)
-    return <div className="p-8 text-center">Loading dashboard...</div>;
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse p-4 md:p-8">
+        <div className="h-8 bg-neutral-200 rounded w-1/3 mb-6"></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-neutral-200 h-32 rounded"></div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <div className="bg-neutral-200 h-64 rounded"></div>
+          <div className="bg-neutral-200 h-64 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   const adherenceData = [
     { name: "Adherent", value: stats?.system_adherence || 0, color: "#22c55e" },

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 import api from "../services/api";
 import AuthContext from "./useAuth";
 
@@ -39,42 +40,50 @@ export const AuthProvider = ({ children }) => {
   const loading = false;
 
   const login = async (username, password) => {
-    const response = await api.post("auth/token/", {
-      username,
-      password,
-    });
+    try {
+      const response = await api.post("auth/token/", {
+        username,
+        password,
+      });
 
-    const {
-      access,
-      refresh,
-      role,
-      user_id,
-      username: responseUsername,
-      full_name: responseFullName,
-    } = response.data;
+      const {
+        access,
+        refresh,
+        role,
+        user_id,
+        username: responseUsername,
+        full_name: responseFullName,
+      } = response.data;
 
-    localStorage.setItem("access_token", access);
-    localStorage.setItem("refresh_token", refresh);
-    localStorage.setItem("role", role);
-    localStorage.setItem("user_id", user_id);
-    localStorage.setItem("full_name", responseFullName);
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      localStorage.setItem("role", role);
+      localStorage.setItem("user_id", user_id);
+      localStorage.setItem("full_name", responseFullName);
 
-    const decoded = jwtDecode(access);
+      const decoded = jwtDecode(access);
 
-    setUser({
-      ...decoded,
-      role,
-      user_id,
-      username: responseUsername,
-      full_name: responseFullName,
-    });
+      setUser({
+        ...decoded,
+        role,
+        user_id,
+        username: responseUsername,
+        full_name: responseFullName,
+      });
 
-    return role;
+      toast.success(`Welcome back, ${responseFullName || responseUsername}!`);
+
+      return role;
+    } catch (error) {
+      toast.error("Login failed. Please check your credentials.");
+      throw error;
+    }
   };
 
   const logout = () => {
     clearStorage();
     setUser(null);
+    toast.success("Logged out successfully");
   };
 
   return (
