@@ -163,40 +163,40 @@ const AdminUsers = ({ role }) => {
         </button>
       </div>
 
-      <div className="bg-white p-4  shadow-sm border border-neutral-200 flex items-center gap-3">
+      <div className="bg-white dark:bg-neutral-900 p-4  shadow-sm border border-neutral-200 flex items-center gap-3">
         <Search className="text-neutral-400" size={20} />
         <input
           type="text"
           placeholder={`Search ${role}s...`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 outline-none text-neutral-900"
+          className="flex-1 outline-none text-neutral-900 dark:text-neutral-100"
         />
       </div>
 
-      <div className="hidden lg:block bg-white  shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="hidden lg:block bg-white dark:bg-neutral-900  shadow-sm border border-neutral-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[600px]">
-            <thead className="bg-neutral-50 border-b border-neutral-200">
+            <thead className="bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-200">
               <tr>
-                <th className="px-6 py-3 font-medium text-neutral-500">
+                <th className="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400">
                   Username
                 </th>
-                <th className="px-6 py-3 font-medium text-neutral-500">
+                <th className="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400">
                   Status
                 </th>
-                <th className="px-6 py-3 font-medium text-neutral-500">
+                <th className="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400">
                   Created At
                 </th>
-                <th className="px-6 py-3 font-medium text-neutral-500 text-right">
+                <th className="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400 text-right">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-neutral-50 transition">
-                  <td className="px-6 py-4 font-medium text-neutral-900">
+                <tr key={user.id} className="hover:bg-neutral-50 dark:bg-neutral-950 transition">
+                  <td className="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100">
                     {user.username}
                   </td>
                   <td className="px-6 py-4">
@@ -206,20 +206,20 @@ const AdminUsers = ({ role }) => {
                       {user.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-neutral-500">
+                  <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400">
                     {new Date(user.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                     <button
                       onClick={() => openEdit(user)}
-                      className="p-2 text-neutral-500 hover:text-blue-600 bg-neutral-100  transition"
+                      className="p-2 text-neutral-500 dark:text-neutral-400 hover:text-blue-600 bg-neutral-100 dark:bg-neutral-800  transition"
                       title="Edit"
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
                       onClick={() => confirmDelete(user)}
-                      className="p-2 text-neutral-500 hover:text-red-600 bg-neutral-100  transition"
+                      className="p-2 text-neutral-500 dark:text-neutral-400 hover:text-red-600 bg-neutral-100 dark:bg-neutral-800  transition"
                       title="Delete"
                     >
                       <Trash2 size={16} />
@@ -231,7 +231,7 @@ const AdminUsers = ({ role }) => {
                 <tr>
                   <td
                     colSpan="4"
-                    className="px-6 py-8 text-center text-neutral-500"
+                    className="px-6 py-8 text-center text-neutral-500 dark:text-neutral-400"
                   >
                     No users found.
                   </td>
@@ -247,12 +247,12 @@ const AdminUsers = ({ role }) => {
         {filteredUsers.map((user) => (
           <div
             key={user.id}
-            className="bg-white p-4 shadow-sm border border-neutral-200 space-y-3"
+            className="bg-white dark:bg-neutral-900 p-4 shadow-sm border border-neutral-200 space-y-3"
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-neutral-900">{user.username}</h3>
-                <p className="text-sm text-neutral-500">
+                <h3 className="font-bold text-neutral-900 dark:text-neutral-100">{user.username}</h3>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
                   Created: {new Date(user.created_at).toLocaleDateString()}
                 </p>
               </div>
@@ -270,7 +270,7 @@ const AdminUsers = ({ role }) => {
             <div className="flex gap-2 pt-2 border-t border-neutral-100">
               <button
                 onClick={() => openEdit(user)}
-                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 bg-neutral-50 hover:bg-neutral-100"
+                className="flex-1 py-2 text-center text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-950 hover:bg-neutral-100 dark:bg-neutral-800"
               >
                 Edit
               </button>
@@ -284,7 +284,7 @@ const AdminUsers = ({ role }) => {
           </div>
         ))}
         {filteredUsers.length === 0 && (
-          <div className="text-center text-neutral-500 py-8">
+          <div className="text-center text-neutral-500 dark:text-neutral-400 py-8">
             No users found.
           </div>
         )}
@@ -293,14 +293,14 @@ const AdminUsers = ({ role }) => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white  shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white dark:bg-neutral-900  shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">
                 {currentUser ? "Edit" : "Add"} {role}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-neutral-400 hover:text-black transition"
+                className="text-neutral-400 hover:text-black dark:text-white transition"
               >
                 <X size={24} />
               </button>
@@ -308,7 +308,7 @@ const AdminUsers = ({ role }) => {
 
             <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                   Username
                 </label>
                 <input
@@ -324,7 +324,7 @@ const AdminUsers = ({ role }) => {
 
               {!currentUser && (
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                     Password
                   </label>
                   <input
@@ -341,7 +341,7 @@ const AdminUsers = ({ role }) => {
 
               {currentUser && (
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                     New Password (Optional)
                   </label>
                   <input
@@ -359,7 +359,7 @@ const AdminUsers = ({ role }) => {
               {role === "patient" && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                       Full Name
                     </label>
                     <input
@@ -372,7 +372,7 @@ const AdminUsers = ({ role }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                       Phone
                     </label>
                     <input
@@ -385,7 +385,7 @@ const AdminUsers = ({ role }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                       DOB
                     </label>
                     <input

@@ -22,7 +22,7 @@ const ConfirmModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white  shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white dark:bg-neutral-900  shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-3">
             {isDanger && (
@@ -34,18 +34,18 @@ const ConfirmModal = ({
           </div>
           <button
             onClick={onClose}
-            className="text-neutral-400 hover:text-black transition"
+            className="text-neutral-400 hover:text-black dark:text-white transition"
           >
             <X size={20} />
           </button>
         </div>
 
-        <p className="text-neutral-600 mb-6">{message}</p>
+        <p className="text-neutral-600 dark:text-neutral-400 mb-6">{message}</p>
 
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100  transition"
+            className="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:bg-neutral-800  transition"
           >
             Cancel
           </button>

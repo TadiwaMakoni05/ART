@@ -912,3 +912,26 @@ class DownloadReportView(views.APIView):
             return Response({"error": "You do not have permission to view this report"}, status=status.HTTP_403_FORBIDDEN)
             
         return FileResponse(report.file.open('rb'), as_attachment=True, filename=report.file.name.split('/')[-1])
+
+from .serializers import PushSubscriptionSerializer
+from .models import PushSubscription
+
+class PushSubscribeView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        serializer = PushSubscriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create or update subscription
+            endpoint = serializer.validated_data['endpoint']
+            sub, created = PushSubscription.objects.update_or_create(
+                endpoint=endpoint,
+                defaults={
+                    'user': user,
+                    'p256dh': serializer.validated_data['p256dh'],
+                    'auth': serializer.validated_data['auth']
+                }
+            )
+            return Response({"status": "subscribed", "created": created}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

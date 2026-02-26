@@ -72,18 +72,18 @@ const CreatePatient = () => {
       );
 
     return (
-      <div className="min-h-screen bg-neutral-50 p-8 flex items-center justify-center">
-        <div className="max-w-xl w-full bg-white  shadow-lg border border-neutral-200 p-8 text-center space-y-6">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-8 flex items-center justify-center">
+        <div className="max-w-xl w-full bg-white dark:bg-neutral-900  shadow-lg border border-neutral-200 p-8 text-center space-y-6">
           <div className="w-16 h-16 bg-green-100  flex items-center justify-center mx-auto">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h2 className="text-2xl font-bold">Patient Account Created!</h2>
-          <p className="text-neutral-600">
+          <p className="text-neutral-600 dark:text-neutral-400">
             Share credentials securely with the patient.
           </p>
 
           {/* Credentials Box */}
-          <div className="bg-neutral-50 p-6  border border-neutral-200 text-left space-y-3">
+          <div className="bg-neutral-50 dark:bg-neutral-950 p-6  border border-neutral-200 text-left space-y-3">
             {["Username", "Password"].map((field) => {
               const value = field === "Username" ? username : password;
               return (
@@ -91,7 +91,7 @@ const CreatePatient = () => {
                   key={field}
                   className={field === "Password" ? "border-t pt-3" : ""}
                 >
-                  <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                     {field}
                   </span>
                   <div className="flex justify-between items-center gap-2">
@@ -100,7 +100,7 @@ const CreatePatient = () => {
                     </p>
                     <button
                       onClick={() => navigator.clipboard.writeText(value)}
-                      className="text-neutral-400 hover:text-neutral-600 p-1"
+                      className="text-neutral-400 hover:text-neutral-600 dark:text-neutral-400 p-1"
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -110,7 +110,7 @@ const CreatePatient = () => {
             })}
             <button
               onClick={copyAll}
-              className="mt-2 text-sm font-medium text-black hover:underline"
+              className="mt-2 text-sm font-medium text-black dark:text-white hover:underline"
             >
               Copy All
             </button>
@@ -118,7 +118,7 @@ const CreatePatient = () => {
 
           {/* Share via Buttons */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-neutral-900">
+            <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
               Share via:
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -161,8 +161,8 @@ const CreatePatient = () => {
 
   // Patient creation form
   return (
-    <div className="min-h-screen bg-neutral-50 p-4 md:p-8">
-      <div className="max-w-3xl mx-auto bg-white  shadow-sm border border-neutral-200 p-6 md:p-8">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-4 md:p-8">
+      <div className="max-w-3xl mx-auto bg-white dark:bg-neutral-900  shadow-sm border border-neutral-200 p-6 md:p-8">
         <h1 className="text-2xl font-bold mb-6">Register New Patient</h1>
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Personal Info */}
@@ -172,7 +172,7 @@ const CreatePatient = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-neutral-700">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Full Name
                 </label>
                 <input
@@ -184,7 +184,7 @@ const CreatePatient = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Phone
                 </label>
                 <input
@@ -196,7 +196,7 @@ const CreatePatient = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   DOB
                 </label>
                 <input
@@ -209,7 +209,7 @@ const CreatePatient = () => {
                 />
               </div>
               <div className="md:col-span-2">
-                <p className="text-xs text-neutral-500 italic">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 italic">
                   Username will be auto-generated from Full Name (e.g. john.doe)
                 </p>
               </div>
@@ -227,7 +227,7 @@ const CreatePatient = () => {
                 className="flex flex-col md:flex-row gap-2 mb-2 md:items-end"
               >
                 <div className="flex-1">
-                  <label className="text-xs text-neutral-500">Medication</label>
+                  <label className="text-xs text-neutral-500 dark:text-neutral-400">Medication</label>
                   <input
                     value={med.medication_name}
                     onChange={(e) =>
@@ -243,7 +243,7 @@ const CreatePatient = () => {
                 </div>
                 <div className="w-full md:w-24 grid grid-cols-2 md:grid-cols-1 gap-2">
                   <div>
-                    <label className="text-xs text-neutral-500 md:hidden">
+                    <label className="text-xs text-neutral-500 dark:text-neutral-400 md:hidden">
                       Dosage
                     </label>
                     <input
@@ -259,7 +259,7 @@ const CreatePatient = () => {
                 </div>
                 <div className="w-full md:w-24 grid grid-cols-2 md:grid-cols-1 gap-2">
                   <div>
-                    <label className="text-xs text-neutral-500 md:hidden">
+                    <label className="text-xs text-neutral-500 dark:text-neutral-400 md:hidden">
                       Time
                     </label>
                     <input
@@ -278,7 +278,7 @@ const CreatePatient = () => {
             <button
               type="button"
               onClick={addMedication}
-              className="text-sm font-medium text-black hover:underline"
+              className="text-sm font-medium text-black dark:text-white hover:underline"
             >
               + Add Medication
             </button>
@@ -289,7 +289,7 @@ const CreatePatient = () => {
             <button
               type="button"
               onClick={() => navigate("/provider")}
-              className="flex-1 py-3 text-neutral-600 hover:text-black font-medium border border-neutral-300 "
+              className="flex-1 py-3 text-neutral-600 dark:text-neutral-400 hover:text-black dark:text-white font-medium border border-neutral-300 "
             >
               Cancel
             </button>

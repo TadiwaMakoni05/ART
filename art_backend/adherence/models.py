@@ -320,3 +320,13 @@ class ViralLoadReview(models.Model):
 
     def __str__(self):
         return f"Review for {self.viral_load_result} - {self.review_status}"
+
+class PushSubscription(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='push_subscriptions')
+    endpoint = models.URLField(max_length=500, unique=True)
+    p256dh = models.CharField(max_length=100)
+    auth = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Push Subscription for {self.user.username}"

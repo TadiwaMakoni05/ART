@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -27,9 +28,12 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-neutral-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white  shadow-lg border border-neutral-200">
-        <h2 className="text-3xl font-bold text-center text-neutral-900 tracking-tight">
+    <div className="flex items-center justify-center min-h-screen bg-neutral-100 dark:bg-neutral-800">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-neutral-900 shadow-lg border border-neutral-200 relative">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
+        <h2 className="text-3xl font-bold text-center text-neutral-900 dark:text-neutral-100 tracking-tight">
           ART Companion
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -37,7 +41,7 @@ const Login = () => {
             <div className="text-red-500 text-sm text-center">{error}</div>
           )}
           <div>
-            <label className="block text-sm font-medium text-neutral-700">
+            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Username
             </label>
             <input
@@ -49,7 +53,7 @@ const Login = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-700">
+            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Password
             </label>
             <input
@@ -71,7 +75,7 @@ const Login = () => {
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="text-xs text-neutral-500 hover:underline"
+            className="text-xs text-neutral-500 dark:text-neutral-400 hover:underline"
           >
             Secure Healthcare System
           </button>

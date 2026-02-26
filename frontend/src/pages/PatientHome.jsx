@@ -74,12 +74,65 @@ const PatientHome = () => {
     }
   };
 
+  // Helper to convert VAPID key
+  const urlB64ToUint8Array = (base64String) => {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, "+")
+      .replace(/_/g, "/");
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
+  const subscribeUserToPush = async () => {
+    if ("serviceWorker" in navigator && "PushManager" in window) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const existingSub = await registration.pushManager.getSubscription();
+        if (existingSub) {
+          return; // Already subscribed on this browser
+        }
+
+        const vapidPublicKey =
+          "BDtGgGjvMh_UfenhoQfpWbE3X0MxrvBRVzBkkNwcFkIJx7zDOP4P_onVV8kYYI2Wd2otuzZQN8Gi4y-n6ORLaRM";
+        const convertedVapidKey = urlB64ToUint8Array(vapidPublicKey);
+
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedVapidKey,
+        });
+
+        // Send to backend
+        const subData = JSON.parse(JSON.stringify(subscription));
+        await api.post("push/subscribe/", {
+          endpoint: subData.endpoint,
+          p256dh: subData.keys.p256dh,
+          auth: subData.keys.auth,
+        });
+        console.log("Push subscription saved.");
+      } catch (e) {
+        console.error("Push subscription failed", e);
+      }
+    }
+  };
+
   useEffect(() => {
     fetchData();
 
-    // Request notification permission early
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
+    if ("Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            subscribeUserToPush();
+          }
+        });
+      } else if (Notification.permission === "granted") {
+        subscribeUserToPush();
+      }
     }
   }, []);
 

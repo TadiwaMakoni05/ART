@@ -127,7 +127,7 @@ const Settings = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-8 text-neutral-900">Settings</h1>
+      <h1 className="text-3xl font-bold mb-8 text-neutral-900 dark:text-neutral-100">Settings</h1>
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar / Tabs */}
@@ -139,7 +139,7 @@ const Settings = () => {
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 activeTab === section.id
                   ? "bg-black text-white shadow-md"
-                  : "bg-white text-neutral-600 hover:bg-neutral-100"
+                  : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:bg-neutral-800"
               }`}
             >
               <section.icon size={18} />
@@ -152,7 +152,7 @@ const Settings = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 bg-white p-6 md:p-8 shadow-sm border border-neutral-200">
+        <div className="flex-1 bg-white dark:bg-neutral-900 p-6 md:p-8 shadow-sm border border-neutral-200">
           {successMsg && (
             <div className="mb-6 p-4 bg-green-50 text-green-700 border border-green-200 rounded">
               {successMsg}
@@ -167,7 +167,7 @@ const Settings = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                     Full Name
                   </label>
                   <input
@@ -183,18 +183,18 @@ const Settings = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                     Username
                   </label>
                   <input
                     type="text"
                     value={profileData.username}
                     disabled
-                    className="w-full p-2 border border-neutral-300 bg-neutral-100 text-neutral-500 cursor-not-allowed"
+                    className="w-full p-2 border border-neutral-300 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-not-allowed"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                     Email Address
                   </label>
                   <input
@@ -207,7 +207,7 @@ const Settings = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                     Phone Number
                   </label>
                   <input
@@ -223,7 +223,7 @@ const Settings = () => {
 
               {user?.role === "provider" && (
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                     Specialty / Title
                   </label>
                   <input
@@ -255,7 +255,7 @@ const Settings = () => {
                 </h2>
                 <div className="space-y-4 max-w-md">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                       Current Password
                     </label>
                     <input
@@ -271,7 +271,7 @@ const Settings = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                       New Password
                     </label>
                     <input
@@ -287,7 +287,7 @@ const Settings = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                       Confirm New Password
                     </label>
                     <input
@@ -318,12 +318,12 @@ const Settings = () => {
                 <h3 className="text-lg font-bold mb-4">
                   Two-Factor Authentication
                 </h3>
-                <div className="flex items-center justify-between p-4 bg-neutral-50 rounded border border-neutral-100">
+                <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-950 rounded border border-neutral-100">
                   <div>
-                    <p className="font-medium text-neutral-900">
+                    <p className="font-medium text-neutral-900 dark:text-neutral-100">
                       Enable 2FA (SMS/Email)
                     </p>
-                    <p className="text-sm text-neutral-500">
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
                       Add an extra layer of security to your account.
                     </p>
                   </div>
@@ -334,7 +334,7 @@ const Settings = () => {
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-neutral-900 transition-transform ${
                         settings.twoFactor ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
@@ -374,7 +374,7 @@ const Settings = () => {
                   >
                     <div>
                       <p className="font-medium">{item.label}</p>
-                      <p className="text-sm text-neutral-500">{item.desc}</p>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400">{item.desc}</p>
                     </div>
                     <button
                       onClick={() => toggleSetting(item.key)}
@@ -383,7 +383,7 @@ const Settings = () => {
                       }`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-neutral-900 transition-transform ${
                           settings[item.key] ? "translate-x-6" : "translate-x-1"
                         }`}
                       />
@@ -397,13 +397,13 @@ const Settings = () => {
           {/* DUMMY SECTIONS (Placeholders) */}
           {["gamification", "privacy", "support"].includes(activeTab) && (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <HelpCircle className="w-8 h-8 text-neutral-400" />
               </div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
                 Coming Soon
               </h3>
-              <p className="text-neutral-500 max-w-md mx-auto">
+              <p className="text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
                 This section ({activeTab}) is currently under development. Check
                 back later for updates!
               </p>

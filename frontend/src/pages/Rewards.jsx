@@ -65,7 +65,7 @@ const Rewards = () => {
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 -ml-2 text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          className="p-2 -ml-2 text-neutral-400 hover:text-white hover:bg-white dark:bg-neutral-900/10 rounded-full transition-all"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -111,11 +111,11 @@ const Rewards = () => {
 
           {history.badges.length === 0 ? (
             <div className="p-8 rounded-2xl bg-neutral-900/50 border border-neutral-800 text-center backdrop-blur-sm">
-              <Star className="w-10 h-10 text-neutral-700 mx-auto mb-3" />
+              <Star className="w-10 h-10 text-neutral-700 dark:text-neutral-300 mx-auto mb-3" />
               <p className="text-neutral-400 font-medium">
                 No badges earned yet.
               </p>
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
                 Maintain 100% adherence this week to earn Gold!
               </p>
             </div>
@@ -140,7 +140,7 @@ const Rewards = () => {
                   <span className="font-bold text-sm capitalize text-neutral-200">
                     {badge.badge_type}
                   </span>
-                  <span className="text-[10px] text-neutral-500 mt-1 flex items-center gap-1">
+                  <span className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-1 flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     {new Date(badge.week_start_date).toLocaleDateString(
                       undefined,
@@ -164,7 +164,7 @@ const Rewards = () => {
 
           <div className="space-y-2">
             {history.transactions.length === 0 ? (
-              <div className="p-6 text-center text-neutral-500 bg-neutral-900/50 rounded-xl border border-neutral-800">
+              <div className="p-6 text-center text-neutral-500 dark:text-neutral-400 bg-neutral-900/50 rounded-xl border border-neutral-800">
                 Start logging your intakes to see history here.
               </div>
             ) : (
@@ -185,7 +185,7 @@ const Rewards = () => {
                       <p className="font-medium text-neutral-200 text-sm">
                         {tx.reason}
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
                         {new Date(tx.created_at).toLocaleString(undefined, {
                           weekday: "short",
                           hour: "numeric",
@@ -205,7 +205,7 @@ const Rewards = () => {
             )}
           </div>
           {history.transactions.length > 5 && (
-            <button className="w-full py-3 text-sm text-neutral-500 hover:text-white transition-colors border-t border-neutral-800 mt-2">
+            <button className="w-full py-3 text-sm text-neutral-500 dark:text-neutral-400 hover:text-white transition-colors border-t border-neutral-800 mt-2">
               View All History
             </button>
           )}

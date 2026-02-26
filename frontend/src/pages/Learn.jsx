@@ -93,13 +93,13 @@ const Learn = () => {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-50 pb-20">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-20">
       {/* Header */}
-      <div className="bg-white p-6 border-b border-neutral-200 sticky top-0 z-10">
+      <div className="bg-white dark:bg-neutral-900 p-6 border-b border-neutral-200 sticky top-0 z-10">
         <div className="flex items-center gap-4 mb-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-neutral-100 "
+            className="p-2 hover:bg-neutral-100 dark:bg-neutral-800 "
           >
             <ChevronRight className="w-6 h-6 rotate-180" />
           </button>
@@ -115,7 +115,7 @@ const Learn = () => {
               className={`px-4 py-2  text-sm font-medium whitespace-nowrap capitalize transition ${
                 activeCategory === cat
                   ? "bg-black text-white shadow-lg"
-                  : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
+                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200"
               }`}
             >
               {cat}
@@ -129,7 +129,7 @@ const Learn = () => {
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            className={`bg-white p-6  shadow-sm border border-neutral-100 hover:shadow-md transition flex flex-col justify-between h-full ${
+            className={`bg-white dark:bg-neutral-900 p-6  shadow-sm border border-neutral-100 hover:shadow-md transition flex flex-col justify-between h-full ${
               item.type === "quote" ? "border-l-4 border-l-yellow-400" : ""
             }`}
           >
@@ -154,17 +154,17 @@ const Learn = () => {
               </div>
               {item.type === "quote" ? (
                 <>
-                  <p className="text-lg italic text-neutral-700 mb-2">
+                  <p className="text-lg italic text-neutral-700 dark:text-neutral-300 mb-2">
                     "{item.content}"
                   </p>
-                  <p className="text-sm text-neutral-500 font-medium">
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
                     — {item.title}
                   </p>
                 </>
               ) : (
                 <>
                   <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-neutral-600 leading-relaxed">
+                  <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
                     {item.content}
                   </p>
                 </>

@@ -15,10 +15,10 @@ import {
 } from "recharts";
 
 const StatCard = ({ title, value, icon, color }) => (
-  <div className="bg-white p-6  shadow-sm border border-neutral-200 flex items-start justify-between">
+  <div className="bg-white dark:bg-neutral-900 p-6  shadow-sm border border-neutral-200 flex items-start justify-between">
     <div>
-      <p className="text-sm font-medium text-neutral-500 mb-1">{title}</p>
-      <h3 className="text-2xl font-bold text-neutral-900">{value}</h3>
+      <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{title}</p>
+      <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{value}</h3>
     </div>
     <div className={`p-3  ${color}`}>{icon}</div>
   </div>
@@ -86,8 +86,8 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">System Overview</h1>
-        <p className="text-neutral-500">Welcome back, Administrator.</p>
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">System Overview</h1>
+        <p className="text-neutral-500 dark:text-neutral-400">Welcome back, Administrator.</p>
       </div>
 
       {/* Stats Grid */}
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Adherence Chart */}
-        <div className="bg-white p-6  shadow-sm border border-neutral-200">
+        <div className="bg-white dark:bg-neutral-900 p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-bold mb-4">System Adherence</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
               <span className="text-3xl font-bold">
                 {stats?.system_adherence}%
               </span>
-              <p className="text-sm text-neutral-500">Average</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Average</p>
             </div>
             {/* Push content down after absolute centering hack */}
             <div className="mt-[100px]"></div>
@@ -153,7 +153,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* User Growth Chart (Mocked for now) */}
-        <div className="bg-white p-6  shadow-sm border border-neutral-200">
+        <div className="bg-white dark:bg-neutral-900 p-6  shadow-sm border border-neutral-200">
           <h3 className="text-lg font-bold mb-4">User Growth Trends</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -181,7 +181,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Recent Activity Feed */}
-      <div className="bg-white  shadow-sm border border-neutral-200 overflow-hidden">
+      <div className="bg-white dark:bg-neutral-900  shadow-sm border border-neutral-200 overflow-hidden">
         <div className="p-6 border-b border-neutral-200">
           <h3 className="text-lg font-bold">Recent Activity</h3>
         </div>
@@ -189,12 +189,12 @@ const AdminDashboard = () => {
           {stats?.recent_activity?.map((log, index) => (
             <div
               key={index}
-              className="p-4 flex items-center justify-between hover:bg-neutral-50 transition"
+              className="p-4 flex items-center justify-between hover:bg-neutral-50 dark:bg-neutral-950 transition"
             >
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2  bg-blue-500"></div>
-                <p className="font-medium text-neutral-900">{log.action}</p>
-                <span className="text-neutral-500 text-sm">({log.target})</span>
+                <p className="font-medium text-neutral-900 dark:text-neutral-100">{log.action}</p>
+                <span className="text-neutral-500 dark:text-neutral-400 text-sm">({log.target})</span>
               </div>
               <span className="text-sm text-neutral-400">
                 {new Date(log.timestamp).toLocaleDateString()}
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
             </div>
           ))}
           {(!stats?.recent_activity || stats.recent_activity.length === 0) && (
-            <div className="p-8 text-center text-neutral-500">
+            <div className="p-8 text-center text-neutral-500 dark:text-neutral-400">
               No recent activity found.
             </div>
           )}

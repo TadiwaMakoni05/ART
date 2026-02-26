@@ -162,3 +162,8 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+# Web Push Settings
+VAPID_PUBLIC_KEY = 'BDtGgGjvMh_UfenhoQfpWbE3X0MxrvBRVzBkkNwcFkIJx7zDOP4P_onVV8kYYI2Wd2otuzZQN8Gi4y-n6ORLaRM'
+VAPID_PRIVATE_KEY = 'sGooRh8vWEOtjcUj0ZN0lYcqDHYhsy9d2rSl8SQcquk'
+VAPID_ADMIN_EMAIL = 'mailto:admin@artcompanion.com'

@@ -10,7 +10,7 @@ from .views import (
     MyTokenObtainPairView, GamificationViewSet, QuoteView, AnalyticsView,
     AdminDashboardView, AdminUserViewSet, ProviderViewSet, MessageViewSet,
     PrescriptionViewSet, ViralLoadResultViewSet, DownloadReportView,
-    AIChatView
+    AIChatView, PushSubscribeView
 )
 
 router = DefaultRouter()
@@ -38,6 +38,8 @@ urlpatterns = [
     path('admin/dashboard/', AdminDashboardView.as_view(), name='admin-dashboard'),
     
     path('reports/<int:pk>/download/', DownloadReportView.as_view(), name='download-report'),
+    
+    path('push/subscribe/', PushSubscribeView.as_view(), name='push-subscribe'),
     
     path('', include(router.urls)),
 ]

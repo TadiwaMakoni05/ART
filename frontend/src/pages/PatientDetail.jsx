@@ -262,17 +262,17 @@ const PatientDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 p-8">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-8">
         <div className="max-w-6xl mx-auto space-y-8 animate-pulse">
           <div className="h-4 bg-neutral-200 rounded w-32"></div>
-          <div className="bg-white shadow-sm border border-neutral-200 p-8 flex flex-col gap-4">
+          <div className="bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200 p-8 flex flex-col gap-4">
             <div className="h-8 bg-neutral-200 rounded w-1/3"></div>
             <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white shadow-sm border border-neutral-200 p-6 h-64"></div>
-            <div className="bg-white shadow-sm border border-neutral-200 p-6 h-64"></div>
-            <div className="bg-white shadow-sm border border-neutral-200 p-6 h-64"></div>
+            <div className="bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200 p-6 h-64"></div>
+            <div className="bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200 p-6 h-64"></div>
+            <div className="bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200 p-6 h-64"></div>
           </div>
         </div>
       </div>
@@ -280,7 +280,7 @@ const PatientDetail = () => {
   }
   if (!patient)
     return (
-      <div className="p-8 text-center text-neutral-500">Patient not found</div>
+      <div className="p-8 text-center text-neutral-500 dark:text-neutral-400">Patient not found</div>
     );
 
   // Calculate Adherence Stats
@@ -298,11 +298,11 @@ const PatientDetail = () => {
   ].filter((d) => d.value > 0);
 
   return (
-    <div className="min-h-screen bg-neutral-50 p-8">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <button
           onClick={() => navigate("/provider")}
-          className="flex items-center text-neutral-500 hover:text-black transition"
+          className="flex items-center text-neutral-500 dark:text-neutral-400 hover:text-black dark:text-white transition"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
         </button>
@@ -316,7 +316,7 @@ const PatientDetail = () => {
           isDanger={true}
         />
 
-        <div className="bg-white  shadow-sm border border-neutral-200 p-8">
+        <div className="bg-white dark:bg-neutral-900  shadow-sm border border-neutral-200 p-8">
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -325,20 +325,20 @@ const PatientDetail = () => {
                 </h1>
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="text-neutral-400 hover:text-black transition"
+                  className="text-neutral-400 hover:text-black dark:text-white transition"
                   title="Edit Profile"
                 >
                   <Edit className="w-5 h-5" />
                 </button>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-neutral-500">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-neutral-500 dark:text-neutral-400">
                 <span>DOB: {patient.dob}</span>
                 <span>Phone: {patient.phone}</span>
                 <span>User: {patient.user?.username}</span>
               </div>
             </div>
             <div className="text-left md:text-right w-full md:w-auto">
-              <p className="text-sm text-neutral-500">Overall Adherence</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Overall Adherence</p>
               <p
                 className={`text-3xl font-bold ${
                   adherenceRate >= 85
@@ -357,19 +357,19 @@ const PatientDetail = () => {
         {/* Edit Profile Modal */}
         {isEditingProfile && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white p-6 w-full max-w-md shadow-xl">
+            <div className="bg-white dark:bg-neutral-900 p-6 w-full max-w-md shadow-xl">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold">Edit Patient Profile</h3>
                 <button
                   onClick={() => setIsEditingProfile(false)}
-                  className="text-neutral-400 hover:text-black"
+                  className="text-neutral-400 hover:text-black dark:text-white"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <form onSubmit={handleUpdateProfile} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Full Name
                   </label>
                   <input
@@ -386,7 +386,7 @@ const PatientDetail = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Phone
                   </label>
                   <input
@@ -403,7 +403,7 @@ const PatientDetail = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Date of Birth
                   </label>
                   <input
@@ -420,7 +420,7 @@ const PatientDetail = () => {
                   <button
                     type="button"
                     onClick={() => setIsEditingProfile(false)}
-                    className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200"
+                    className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200"
                   >
                     Cancel
                   </button>
@@ -438,7 +438,7 @@ const PatientDetail = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Regimen Column */}
-          <div className="bg-white  shadow-sm border border-neutral-200 p-6">
+          <div className="bg-white dark:bg-neutral-900  shadow-sm border border-neutral-200 p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Regimen</h2>
               <button
@@ -452,18 +452,18 @@ const PatientDetail = () => {
               {regimen.map((med) => (
                 <li
                   key={med.id}
-                  className="p-4 bg-neutral-50  flex justify-between items-start group"
+                  className="p-4 bg-neutral-50 dark:bg-neutral-950  flex justify-between items-start group"
                 >
                   <div>
                     <div className="font-medium">{med.medication_name}</div>
-                    <div className="text-sm text-neutral-500">
+                    <div className="text-sm text-neutral-500 dark:text-neutral-400">
                       {med.dosage} @ {med.scheduled_time}
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => openEditMedModal(med)}
-                      className="text-neutral-400 hover:text-black opacity-0 group-hover:opacity-100 transition"
+                      className="text-neutral-400 hover:text-black dark:text-white opacity-0 group-hover:opacity-100 transition"
                       title="Edit Medication"
                     >
                       <Edit className="w-4 h-4" />
@@ -479,7 +479,7 @@ const PatientDetail = () => {
                 </li>
               ))}
               {regimen.length === 0 && (
-                <p className="text-neutral-500 text-sm">No active regimen.</p>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm">No active regimen.</p>
               )}
             </ul>
           </div>
@@ -487,21 +487,21 @@ const PatientDetail = () => {
           {/* Add/Edit Medication Modal */}
           {isMedModalOpen && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white p-6 w-full max-w-md shadow-xl">
+              <div className="bg-white dark:bg-neutral-900 p-6 w-full max-w-md shadow-xl">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-bold">
                     {editingMedId ? "Edit Medication" : "Add Medication"}
                   </h3>
                   <button
                     onClick={() => setIsMedModalOpen(false)}
-                    className="text-neutral-400 hover:text-black"
+                    className="text-neutral-400 hover:text-black dark:text-white"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
                 <form onSubmit={handleSaveMedication} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                       Medication Name
                     </label>
                     <input
@@ -523,7 +523,7 @@ const PatientDetail = () => {
                   {!editingMedId && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-neutral-700">
+                        <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                           Total Pills
                         </label>
                         <input
@@ -545,7 +545,7 @@ const PatientDetail = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-neutral-700">
+                      <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                         Dosage
                       </label>
                       <input
@@ -563,7 +563,7 @@ const PatientDetail = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-neutral-700">
+                      <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                         Scheduled Time
                       </label>
                       <input
@@ -585,7 +585,7 @@ const PatientDetail = () => {
                     <button
                       type="button"
                       onClick={() => setIsMedModalOpen(false)}
-                      className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200"
+                      className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200"
                     >
                       Cancel
                     </button>
@@ -607,7 +607,7 @@ const PatientDetail = () => {
           )}
 
           {/* Adherence Chart Column */}
-          <div className="bg-white  shadow-sm border border-neutral-200 p-6 flex flex-col items-center">
+          <div className="bg-white dark:bg-neutral-900  shadow-sm border border-neutral-200 p-6 flex flex-col items-center">
             <h2 className="text-lg font-semibold mb-4 w-full text-left">
               Adherence Breakdown
             </h2>
@@ -639,13 +639,13 @@ const PatientDetail = () => {
           </div>
 
           {/* History List Column */}
-          <div className="bg-white  shadow-sm border border-neutral-200 p-6">
+          <div className="bg-white dark:bg-neutral-900  shadow-sm border border-neutral-200 p-6">
             <h2 className="text-lg font-semibold mb-4">Recent Logs</h2>
             <ul className="space-y-2 max-h-[300px] overflow-y-auto">
               {logs.map((log) => (
                 <li
                   key={log.id}
-                  className="flex justify-between items-center text-sm p-2 hover:bg-neutral-50 "
+                  className="flex justify-between items-center text-sm p-2 hover:bg-neutral-50 dark:bg-neutral-950 "
                 >
                   <span>{new Date(log.created_at).toLocaleDateString()}</span>
                   <span
@@ -660,13 +660,13 @@ const PatientDetail = () => {
                 </li>
               ))}
               {logs.length === 0 && (
-                <p className="text-neutral-500 text-sm">No logs yet.</p>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm">No logs yet.</p>
               )}
             </ul>
           </div>
 
           {/* Viral Load & Reviews Column */}
-          <div className="bg-white shadow-sm border border-neutral-200 p-6 lg:col-span-3">
+          <div className="bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200 p-6 lg:col-span-3">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Viral Load & Reviews</h2>
               <button
@@ -677,8 +677,8 @@ const PatientDetail = () => {
               </button>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left text-neutral-500">
-                <thead className="text-xs text-neutral-700 uppercase bg-neutral-50">
+              <table className="w-full text-sm text-left text-neutral-500 dark:text-neutral-400">
+                <thead className="text-xs text-neutral-700 dark:text-neutral-300 uppercase bg-neutral-50 dark:bg-neutral-950">
                   <tr>
                     <th className="px-4 py-3">Test Date</th>
                     <th className="px-4 py-3">Viral Load</th>
@@ -690,7 +690,7 @@ const PatientDetail = () => {
                 <tbody>
                   {viralLoads.map((vl) => (
                     <tr key={vl.id} className="border-b">
-                      <td className="px-4 py-3 font-medium text-neutral-900">
+                      <td className="px-4 py-3 font-medium text-neutral-900 dark:text-neutral-100">
                         {vl.test_date}
                       </td>
                       <td className="px-4 py-3">{vl.viral_load_value}</td>
@@ -702,7 +702,7 @@ const PatientDetail = () => {
                         <div className="flex gap-2 justify-end">
                           <button
                             onClick={() => openEditVlModal(vl)}
-                            className="text-neutral-400 hover:text-black transition"
+                            className="text-neutral-400 hover:text-black dark:text-white transition"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4" />
@@ -722,7 +722,7 @@ const PatientDetail = () => {
                     <tr>
                       <td
                         colSpan="5"
-                        className="px-4 py-8 text-center text-neutral-500"
+                        className="px-4 py-8 text-center text-neutral-500 dark:text-neutral-400"
                       >
                         No viral load records found.
                       </td>
@@ -738,7 +738,7 @@ const PatientDetail = () => {
       {/* Viral Load Modal */}
       {isVlModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 w-full max-w-md shadow-xl">
+          <div className="bg-white dark:bg-neutral-900 p-6 w-full max-w-md shadow-xl">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold">
                 {editingVlId
@@ -747,14 +747,14 @@ const PatientDetail = () => {
               </h3>
               <button
                 onClick={() => setIsVlModalOpen(false)}
-                className="text-neutral-400 hover:text-black"
+                className="text-neutral-400 hover:text-black dark:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleSaveVl} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-neutral-700">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Test Date
                 </label>
                 <input
@@ -768,7 +768,7 @@ const PatientDetail = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Viral Load Value
                 </label>
                 <input
@@ -786,7 +786,7 @@ const PatientDetail = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Review Date (Optional)
                 </label>
                 <input
@@ -805,7 +805,7 @@ const PatientDetail = () => {
                 <button
                   type="button"
                   onClick={() => setIsVlModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200"
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200"
                 >
                   Cancel
                 </button>

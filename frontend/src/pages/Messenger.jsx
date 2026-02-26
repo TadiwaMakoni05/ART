@@ -227,17 +227,17 @@ const Messenger = () => {
   };
 
   return (
-    <div className="flex h-screen bg-neutral-100">
+    <div className="flex h-screen bg-neutral-100 dark:bg-neutral-800">
       {/* Sidebar */}
       <div
-        className={`w-full md:w-1/3 bg-white border-r border-neutral-200 flex flex-col ${
+        className={`w-full md:w-1/3 bg-white dark:bg-neutral-900 border-r border-neutral-200 flex flex-col ${
           activeConversation ? "hidden md:flex" : "flex"
         }`}
       >
         <div className="p-4 border-b border-neutral-200 font-bold text-lg flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="p-1 hover:bg-neutral-100 rounded"
+            className="p-1 hover:bg-neutral-100 dark:bg-neutral-800 rounded"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -248,7 +248,7 @@ const Messenger = () => {
             <div
               key={conv.id}
               onClick={() => setActiveConversation(conv)}
-              className={`p-4 border-b border-neutral-100 cursor-pointer hover:bg-neutral-50 ${activeConversation?.id === conv.id ? "bg-neutral-100" : ""}`}
+              className={`p-4 border-b border-neutral-100 cursor-pointer hover:bg-neutral-50 dark:bg-neutral-950 ${activeConversation?.id === conv.id ? "bg-neutral-100 dark:bg-neutral-800" : ""}`}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1 min-w-0">
@@ -261,7 +261,7 @@ const Messenger = () => {
                       ></div>
                     )}
                   </div>
-                  <div className="text-sm text-neutral-500 truncate mt-1">
+                  <div className="text-sm text-neutral-500 dark:text-neutral-400 truncate mt-1">
                     {conv.lastMessage ? (
                       <span>
                         {conv.lastMessage.sender == user.user_id ? "You: " : ""}
@@ -307,11 +307,11 @@ const Messenger = () => {
         {activeConversation ? (
           <>
             {/* Header */}
-            <div className="p-4 bg-white border-b border-neutral-200 flex justify-between items-center shadow-sm z-10">
+            <div className="p-4 bg-white dark:bg-neutral-900 border-b border-neutral-200 flex justify-between items-center shadow-sm z-10">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setActiveConversation(null)}
-                  className="md:hidden p-2 -ml-2 hover:bg-neutral-100 "
+                  className="md:hidden p-2 -ml-2 hover:bg-neutral-100 dark:bg-neutral-800 "
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
@@ -322,7 +322,7 @@ const Messenger = () => {
                   activeConversation.role === "Patient" && (
                     <button
                       onClick={handleGenerateReport}
-                      className="text-xs mr-2 px-3 py-1.5 bg-neutral-100 font-semibold border border-neutral-300 hover:bg-neutral-200 transition"
+                      className="text-xs mr-2 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 font-semibold border border-neutral-300 hover:bg-neutral-200 transition"
                     >
                       Generate adherence report
                     </button>
@@ -330,20 +330,20 @@ const Messenger = () => {
                 {activeConversation.phone && (
                   <a
                     href={`tel:${activeConversation.phone}`}
-                    className="p-2 hover:bg-neutral-100  flex items-center justify-center text-black"
+                    className="p-2 hover:bg-neutral-100 dark:bg-neutral-800  flex items-center justify-center text-black dark:text-white"
                     title={`Call ${activeConversation.phone}`}
                   >
                     <Phone className="w-5 h-5" />
                   </a>
                 )}
-                <button className="p-2 hover:bg-neutral-100 ">
+                <button className="p-2 hover:bg-neutral-100 dark:bg-neutral-800 ">
                   <MoreVertical className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-neutral-50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-neutral-50 dark:bg-neutral-950">
               {activeMessages.map((msg) => {
                 const senderId =
                   typeof msg.sender === "object" ? msg.sender.id : msg.sender;
@@ -354,7 +354,7 @@ const Messenger = () => {
                     className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[70%]  p-3 ${isMe ? "bg-black text-white -none" : "bg-white text-black border border-neutral-200 -none"}`}
+                      className={`max-w-[70%]  p-3 ${isMe ? "bg-black text-white -none" : "bg-white dark:bg-neutral-900 text-black dark:text-white border border-neutral-200 -none"}`}
                     >
                       {msg.image && (
                         <img
@@ -367,7 +367,7 @@ const Messenger = () => {
                       {msg.message_type === "adherence_report" ||
                       msg.message_type === "viral_load_report" ? (
                         <div
-                          className={`p-4 mt-1 rounded-md text-sm prose prose-sm max-w-none ${isMe ? "bg-black/20 text-white prose-invert" : "bg-neutral-100 text-black"} [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-5 [&>h3]:text-base [&>h3]:font-bold [&>h3]:mb-2`}
+                          className={`p-4 mt-1 rounded-md text-sm prose prose-sm max-w-none ${isMe ? "bg-black/20 text-white prose-invert" : "bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white"} [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-5 [&>h3]:text-base [&>h3]:font-bold [&>h3]:mb-2`}
                         >
                           <ReactMarkdown>{msg.message}</ReactMarkdown>
                         </div>
@@ -392,9 +392,9 @@ const Messenger = () => {
             </div>
 
             {/* Input */}
-            <div className="p-4 bg-white border-t border-neutral-200">
+            <div className="p-4 bg-white dark:bg-neutral-900 border-t border-neutral-200">
               {image && (
-                <div className="mb-2 p-2 bg-neutral-100  flex justify-between items-center w-max relative">
+                <div className="mb-2 p-2 bg-neutral-100 dark:bg-neutral-800  flex justify-between items-center w-max relative">
                   <img
                     src={URL.createObjectURL(image)}
                     alt="Preview"
@@ -412,7 +412,7 @@ const Messenger = () => {
                 </div>
               )}
               <form onSubmit={handleSend} className="flex gap-2 items-center">
-                <label className="cursor-pointer p-2 hover:bg-neutral-100  text-neutral-500 transition">
+                <label className="cursor-pointer p-2 hover:bg-neutral-100 dark:bg-neutral-800  text-neutral-500 dark:text-neutral-400 transition">
                   <Image className="w-5 h-5" />
                   <input
                     type="file"
@@ -451,7 +451,7 @@ const Messenger = () => {
           onClick={() => setSelectedImage(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 "
+            className="absolute top-4 right-4 text-white p-2 hover:bg-white dark:bg-neutral-900/10 "
             onClick={() => setSelectedImage(null)}
           >
             <X className="w-8 h-8" />

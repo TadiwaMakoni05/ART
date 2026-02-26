@@ -45,12 +45,12 @@ const PatientHistory = () => {
     filter === "all" ? logs : logs.filter((log) => log.status === filter);
 
   return (
-    <div className="min-h-screen bg-neutral-50 pb-20">
-      <div className="bg-white p-6 border-b border-neutral-200 sticky top-0 z-10 space-y-4">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-20">
+      <div className="bg-white dark:bg-neutral-900 p-6 border-b border-neutral-200 sticky top-0 z-10 space-y-4">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-neutral-100 "
+            className="p-2 hover:bg-neutral-100 dark:bg-neutral-800 "
           >
             <ChevronRight className="w-6 h-6 rotate-180" />
           </button>
@@ -64,23 +64,23 @@ const PatientHistory = () => {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="bg-neutral-100  p-2 text-sm outline-none flex-1"
+              className="bg-neutral-100 dark:bg-neutral-800  p-2 text-sm outline-none flex-1"
             />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="bg-neutral-100  p-2 text-sm outline-none flex-1"
+              className="bg-neutral-100 dark:bg-neutral-800  p-2 text-sm outline-none flex-1"
             />
           </div>
           <div className="flex gap-2 justify-between items-center">
-            <span className="text-sm text-neutral-500 flex items-center gap-1">
+            <span className="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
               <Filter className="w-4 h-4" /> Filter Status:
             </span>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="bg-neutral-100 border-none  p-2 text-sm font-medium outline-none text-neutral-600"
+              className="bg-neutral-100 dark:bg-neutral-800 border-none  p-2 text-sm font-medium outline-none text-neutral-600 dark:text-neutral-400"
             >
               <option value="all">All Logs</option>
               <option value="taken">Taken</option>
@@ -93,11 +93,11 @@ const PatientHistory = () => {
 
       <div className="p-6 space-y-4">
         {loading ? (
-          <div className="text-center text-neutral-500 py-10 animate-pulse">
+          <div className="text-center text-neutral-500 dark:text-neutral-400 py-10 animate-pulse">
             Loading history...
           </div>
         ) : filteredLogs.length === 0 ? (
-          <div className="text-center text-neutral-500 py-10">
+          <div className="text-center text-neutral-500 dark:text-neutral-400 py-10">
             No history found for selected range.
           </div>
         ) : (
@@ -110,7 +110,7 @@ const PatientHistory = () => {
                     {filteredLogs.map((log) => (
                       <tr
                         key={log.id}
-                        className="bg-white border-b border-neutral-100 last:border-b-0"
+                        className="bg-white dark:bg-neutral-900 border-b border-neutral-100 last:border-b-0"
                       >
                         <td className="p-4">
                           <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ const PatientHistory = () => {
                               )}
                             </div>
                             <div>
-                              <p className="font-bold text-neutral-900 text-sm">
+                              <p className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">
                                 {log.medication_name || "Medication"}{" "}
                               </p>
                               <p className="text-xs text-neutral-400">
@@ -158,7 +158,7 @@ const PatientHistory = () => {
                             {log.status}
                           </span>
                           {log.actual_time && (
-                            <div className="text-xs text-neutral-500 bg-neutral-50 p-2 rounded-lg mt-2">
+                            <div className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-950 p-2 rounded-lg mt-2">
                               <span>Taken at:</span>
                               <span className="font-mono block">
                                 {new Date(log.actual_time).toLocaleTimeString(
@@ -184,7 +184,7 @@ const PatientHistory = () => {
               {filteredLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="bg-white p-4 shadow-sm border border-neutral-200 flex justify-between items-start"
+                  className="bg-white dark:bg-neutral-900 p-4 shadow-sm border border-neutral-200 flex justify-between items-start"
                 >
                   <div className="flex items-start gap-3">
                     <div
@@ -203,10 +203,10 @@ const PatientHistory = () => {
                       )}
                     </div>
                     <div>
-                      <p className="font-bold text-neutral-900 text-sm">
+                      <p className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">
                         {log.medication_name || "Medication"}
                       </p>
-                      <p className="text-xs text-neutral-500 mt-0.5">
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                         {new Date(log.scheduled_time).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",

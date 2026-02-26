@@ -22,6 +22,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+import ThemeToggle from "../components/ThemeToggle";
+
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -64,13 +66,16 @@ const LandingPage = () => {
   }, [testimonials.length]);
 
   return (
-    <div className="min-h-screen font-sans text-neutral-900 bg-white">
+    <div className="min-h-screen font-sans text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900">
       {/* NAVIGATION */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <Shield className="w-8 h-8 text-black" fill="currentColor" />
+              <Shield
+                className="w-8 h-8 text-black dark:text-white"
+                fill="currentColor"
+              />
               <span className="text-xl font-bold tracking-tight">
                 ART Companion
               </span>
@@ -80,25 +85,25 @@ const LandingPage = () => {
             <div className="hidden md:flex items-center gap-8">
               <a
                 href="#about"
-                className="text-sm font-medium text-neutral-600 hover:text-black transition"
+                className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:text-white transition"
               >
                 About
               </a>
               <a
                 href="#features"
-                className="text-sm font-medium text-neutral-600 hover:text-black transition"
+                className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:text-white transition"
               >
                 Features
               </a>
               <a
                 href="#testimonials"
-                className="text-sm font-medium text-neutral-600 hover:text-black transition"
+                className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:text-white transition"
               >
                 Stories
               </a>
               <a
                 href="#contact"
-                className="text-sm font-medium text-neutral-600 hover:text-black transition"
+                className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:text-white transition"
               >
                 Contact
               </a>
@@ -108,13 +113,15 @@ const LandingPage = () => {
               >
                 Login
               </Link>
+              <ThemeToggle className="ml-2" />
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-neutral-900 focus:outline-none"
+                className="text-neutral-900 dark:text-neutral-100 focus:outline-none"
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
@@ -124,32 +131,32 @@ const LandingPage = () => {
 
         {/* Mobile Nav */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-b border-neutral-100 animate-in slide-in-from-top-4 duration-200">
+          <div className="md:hidden bg-white dark:bg-neutral-900 border-b border-neutral-100 animate-in slide-in-from-top-4 duration-200">
             <div className="px-4 pt-2 pb-6 space-y-2">
               <a
                 href="#about"
-                className="block px-3 py-2 text-base font-medium text-neutral-700 hover:bg-neutral-50 rounded-none"
+                className="block px-3 py-2 text-base font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:bg-neutral-950 rounded-none"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </a>
               <a
                 href="#features"
-                className="block px-3 py-2 text-base font-medium text-neutral-700 hover:bg-neutral-50 rounded-none"
+                className="block px-3 py-2 text-base font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:bg-neutral-950 rounded-none"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
               </a>
               <a
                 href="#testimonials"
-                className="block px-3 py-2 text-base font-medium text-neutral-700 hover:bg-neutral-50 rounded-none"
+                className="block px-3 py-2 text-base font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:bg-neutral-950 rounded-none"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Stories
               </a>
               <a
                 href="#contact"
-                className="block px-3 py-2 text-base font-medium text-neutral-700 hover:bg-neutral-50 rounded-none"
+                className="block px-3 py-2 text-base font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:bg-neutral-950 rounded-none"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
@@ -175,17 +182,17 @@ const LandingPage = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-neutral-100 text-sm font-medium text-neutral-800 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-neutral-100 dark:bg-neutral-800 text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <span className="w-2 h-2 rounded-none bg-green-500"></span>
             Now empowering 10,000+ patients
           </div>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-neutral-900 mb-6 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 mb-6 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
             Stay on Track with <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
               Your Medications
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto mb-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
+          <p className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto mb-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
             ART Companion connects patients and providers for better health
             outcomes. Simple reminders, gamified goals, and real-time support.
           </p>
@@ -198,7 +205,7 @@ const LandingPage = () => {
             </Link>
             <a
               href="#about"
-              className="px-8 py-4 bg-white text-black border border-neutral-200 rounded-none font-bold text-lg hover:bg-neutral-50 transition-colors flex items-center justify-center"
+              className="px-8 py-4 bg-white dark:bg-neutral-900 text-black dark:text-white border border-neutral-200 rounded-none font-bold text-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center"
             >
               Learn More
             </a>
@@ -207,7 +214,7 @@ const LandingPage = () => {
       </section>
 
       {/* ABOUT SECTION */}
-      <section id="about" className="py-20 bg-neutral-50">
+      <section id="about" className="py-20 bg-neutral-50 dark:bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
@@ -217,26 +224,30 @@ const LandingPage = () => {
                   <Shield className="w-32 h-32 text-white opacity-50" />
                 </div>
                 {/* Floating Card 1 */}
-                <div className="absolute top-10 left-10 bg-white p-4 rounded-none shadow-lg animate-bounce duration-[3000ms]">
+                <div className="absolute top-10 left-10 bg-white dark:bg-neutral-900 p-4 rounded-none shadow-lg animate-bounce duration-[3000ms]">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-none bg-green-100 flex items-center justify-center text-green-600">
                       <CheckCircle size={20} />
                     </div>
                     <div>
                       <p className="text-sm font-bold">Daily Goal</p>
-                      <p className="text-xs text-neutral-500">Completed!</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                        Completed!
+                      </p>
                     </div>
                   </div>
                 </div>
                 {/* Floating Card 2 */}
-                <div className="absolute bottom-10 right-10 bg-white p-4 rounded-none shadow-lg animate-bounce duration-[4000ms]">
+                <div className="absolute bottom-10 right-10 bg-white dark:bg-neutral-900 p-4 rounded-none shadow-lg animate-bounce duration-[4000ms]">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-none bg-yellow-100 flex items-center justify-center text-yellow-600">
                       <Award size={20} />
                     </div>
                     <div>
                       <p className="text-sm font-bold">New Badge</p>
-                      <p className="text-xs text-neutral-500">Top Performer</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                        Top Performer
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -246,7 +257,7 @@ const LandingPage = () => {
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 Redefining Healthcare Adherence
               </h2>
-              <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+              <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
                 Managing chronic conditions shouldn't feel like a burden. ART
                 Companion transforms the daily routine of medication adherence
                 into an engaging, supported journey.
@@ -259,7 +270,9 @@ const LandingPage = () => {
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <CheckCircle className="text-green-500 shrink-0" />
-                    <span className="text-neutral-800 font-medium">{item}</span>
+                    <span className="text-neutral-800 dark:text-neutral-200 font-medium">
+                      {item}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -269,13 +282,13 @@ const LandingPage = () => {
       </section>
 
       {/* FEATURES SECTION */}
-      <section id="features" className="py-20 bg-white">
+      <section id="features" className="py-20 bg-white dark:bg-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Everything you need to succeed
             </h2>
-            <p className="text-lg text-neutral-600">
+            <p className="text-lg text-neutral-600 dark:text-neutral-400">
               Tailored tools for patients, providers, and administrators to
               ensure the best possible health outcomes.
             </p>
@@ -322,7 +335,7 @@ const LandingPage = () => {
                   <feature.icon size={28} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-neutral-600 leading-relaxed">
+                <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
                   {feature.desc}
                 </p>
               </div>
@@ -364,7 +377,7 @@ const LandingPage = () => {
                         className={
                           i < t.rating
                             ? "text-yellow-400 fill-yellow-400"
-                            : "text-neutral-700"
+                            : "text-neutral-700 dark:text-neutral-300"
                         }
                       />
                     ))}
@@ -393,7 +406,7 @@ const LandingPage = () => {
                   onClick={() => setActiveTestimonial(index)}
                   className={`w-3 h-3 rounded-none transition-all ${
                     index === activeTestimonial
-                      ? "bg-white w-8"
+                      ? "bg-white dark:bg-neutral-900 w-8"
                       : "bg-neutral-700 hover:bg-neutral-500"
                   }`}
                 />
@@ -403,14 +416,16 @@ const LandingPage = () => {
         </div>
       </section>
 
-
       {/* FOOTER */}
       <footer className="bg-black pt-16 pb-8 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-2 mb-6">
-                <Shield className="w-8 h-8 text-black" fill="currentColor" />
+                <Shield
+                  className="w-8 h-8 text-black dark:text-white"
+                  fill="currentColor"
+                />
                 <span className="text-xl font-bold tracking-tight">
                   ART Companion
                 </span>
@@ -465,13 +480,22 @@ const LandingPage = () => {
               © {new Date().getFullYear()} ART Companion. All rights reserved.
             </p>
             <div className="flex gap-6 text-white">
-              <Twitter size={20} className="hover:text-neutral-300 cursor-pointer" />
-              <Facebook size={20} className="hover:text-neutral-300 cursor-pointer" />
+              <Twitter
+                size={20}
+                className="hover:text-neutral-300 cursor-pointer"
+              />
+              <Facebook
+                size={20}
+                className="hover:text-neutral-300 cursor-pointer"
+              />
               <Instagram
                 size={20}
                 className="hover:text-neutral-300 cursor-pointer"
               />
-              <Linkedin size={20} className="hover:text-neutral-300 cursor-pointer" />
+              <Linkedin
+                size={20}
+                className="hover:text-neutral-300 cursor-pointer"
+              />
             </div>
           </div>
         </div>

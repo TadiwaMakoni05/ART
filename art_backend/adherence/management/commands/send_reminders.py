@@ -52,6 +52,14 @@ class Command(BaseCommand):
                 )
                 send_whatsapp_message(phone, message)
                 
+            # Send Web Push
+            from adherence.utils_push import send_web_push
+            push_title = "Time for your medication"
+            push_body = f"It's time to take your {schedule.medication_name} ({schedule.dosage}). Please mark as taken in the app."
+            pushed = send_web_push(user, push_title, push_body)
+            if pushed:
+                self.stdout.write(f"Sent Web Push notification to {user.username}")
+                
             # Create Log (marked as scheduled/sent)
             # using exact scheduled datetime for accuracy
             scheduled_datetime = datetime.datetime.combine(today, schedule.scheduled_time)

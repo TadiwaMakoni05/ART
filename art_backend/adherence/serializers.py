@@ -4,7 +4,7 @@ from .models import (
     User, PatientProfile, MedicationSchedule, AdherenceLog, ProviderPatientLink,
     CounselingMessage, PatientGamificationProfile, PointTransaction, WeeklyConsistencyBadge,
     Badge, RefillReminder, Alert, AuditLog, Quote, Prescription,
-    ViralLoadResult, ViralLoadReview, ReportFile
+    ViralLoadResult, ViralLoadReview, ReportFile, PushSubscription
 )
 
 # ... (rest of imports)
@@ -203,4 +203,8 @@ class ViralLoadResultSerializer(serializers.ModelSerializer):
         read_only_fields = ['entered_by']
 
 
-
+class PushSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PushSubscription
+        fields = ['endpoint', 'p256dh', 'auth']
+        # user will be read-only and filled by the view
