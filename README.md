@@ -11,12 +11,17 @@ For patients relying on life-long medication regimens like ART, strict daily adh
 ## Main Features
 
 - **Role-Based Access Control**: Secure login and distinct interfaces for Patients, Healthcare Providers, and Administrators.
+- **Progressive Web App (PWA)**: Installable web application with manifest and service worker, providing an app-like experience with offline support capability.
 - **Patient Dashboard & Analytics**: Visual tracking of medication adherence, history logs, and personal health metrics.
 - **Provider & Admin Dashboards**: Overview statistics and real-time monitoring of patient populations for healthcare providers and system administrators.
+- **Viral Load Management**: Dedicated system for providers to track, manage, and review patient viral load test results securely.
+- **Automated Pill Reminders**: Scheduled backend tasks and WhatsApp integration for delivering timely medication alerts directly to patients.
+- **Report Generation**: Capability for providers and admins to generate downloadable adherence reports.
 - **Gamification & Rewards**: A reward system that incentivizes consistent medication adherence by granting points and achievements.
 - **Educational Module (Learn)**: Daily health quotes, tips, and articles to educate and motivate patients.
+- **AI-Powered Chat Assistant**: An integrated AI helper that provides instant, automated, and accurate responses to patient queries regarding their medication, regimen, and general health advice based on validated medical data.
 - **Real-Time Messaging**: Secure, in-app messaging system allowing patients and providers to communicate directly, including image uploads.
-- **Responsive Design**: Optimized for both desktop and mobile devices, ensuring accessibility anywhere.
+- **Enhanced UX & Responsive Design**: Accessible on all devices featuring refined aesthetics, skeleton loaders for seamless transitions, and custom modal confirmation dialogs.
 
 ## Tech Stack
 
@@ -73,6 +78,7 @@ Here are some of the primary API endpoints exposed by the backend:
   - `/api/adherence/` - Record and retrieve medication adherence logs.
 - **Communication & Engagement**:
   - `/api/messages/` - Send and receive real-time messages between users.
+  - `/api/chat/assistant/` - Interact with the AI-powered chatbot helper for automated adherence support.
   - `GET /api/learn/home-quotes/` - Fetch educational quotes for the Learn section.
   - `/api/gamification/` - Manage reward points and streaks.
 
@@ -147,6 +153,6 @@ The application flow adapts based on the user's role upon logging in:
 
 ## Future Improvements
 
-- **Automated Notifications**: Implement push notifications or SMS alerts for pill reminders and upcoming appointments.
+- **Native Push Notifications**: Build upon the existing WhatsApp alerts to include native browser push notifications for pill reminders and upcoming appointments.
 - **Interoperability**: Integrate with existing Electronic Medical Record (EMR) or Health Information Systems (HIS) using HL7/FHIR standards.
-- **Advanced Offline Capabilities**: Enhance the Service Worker and IndexedDB implementation for fully robust offline data synchronization.
+- **Advanced Offline Synchronization**: Further enhance the existing Service Worker and IndexedDB integration for robust offline caching and data sync resolutions.
