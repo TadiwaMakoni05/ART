@@ -303,10 +303,10 @@ const PatientHome = () => {
   return (
     <div className="space-y-6">
       <header className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-neutral-900">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
           Patient Dashboard
         </h1>
-        <p className="text-neutral-500">
+        <p className="text-neutral-500 dark:text-neutral-400">
           Welcome back, {user?.full_name || user?.username}
         </p>
       </header>
@@ -315,7 +315,7 @@ const PatientHome = () => {
           {/* Left Column: Stats & Motivation */}
           <div className="space-y-6 lg:col-span-1">
             {/* Gamification Header Widget */}
-            <div className="bg-gradient-to-br bg-white   p-6 ring-1 ring-black relative overflow-hidden">
+            <div className="bg-gradient-to-br bg-white dark:bg-neutral-950 p-6 ring-1 ring-black dark:ring-neutral-800 relative overflow-hidden shadow-sm">
               {showAnimation && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20 animate-in fade-in zoom-in duration-300">
                   <div className="text-center">
@@ -328,22 +328,24 @@ const PatientHome = () => {
               )}
               <div className="flex justify-between items-start relative z-10">
                 <div>
-                  <p className="text-black text-sm font-medium mb-1">
+                  <p className="text-black dark:text-neutral-400 text-sm font-medium mb-1">
                     Current Streak
                   </p>
                   <div className="flex items-baseline gap-2">
-                    <h2 className="text-4xl font-bold text-black flex items-center gap-2">
+                    <h2 className="text-4xl font-bold text-black dark:text-white flex items-center gap-2">
                       {gamification.current_streak}{" "}
                       <Zap className="w-6 h-6 text-yellow-500 fill-yellow-500" />
                     </h2>
-                    <span className="text-sm text-black">days</span>
+                    <span className="text-sm text-black dark:text-neutral-400">
+                      days
+                    </span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-black text-sm font-medium mb-1">
+                  <p className="text-black dark:text-neutral-400 text-sm font-medium mb-1">
                     Total Points
                   </p>
-                  <div className="text-2xl font-bold text-black flex items-center justify-end gap-2">
+                  <div className="text-2xl font-bold text-black dark:text-white flex items-center justify-end gap-2">
                     {gamification.total_points}{" "}
                     <Award className="w-5 h-5 text-purple-400" />
                   </div>
@@ -351,15 +353,17 @@ const PatientHome = () => {
               </div>
 
               <div className="mt-6">
-                <div className="flex justify-between text-xs text-black mb-2">
-                  <span className="text-black">Weekly Progress</span>
+                <div className="flex justify-between text-xs text-black dark:text-neutral-400 mb-2">
+                  <span className="text-black dark:text-neutral-400">
+                    Weekly Progress
+                  </span>
                   <span>
                     {gamification.current_streak > 0
                       ? "On Fire!"
                       : "Keep going!"}
                   </span>
                 </div>
-                <div className="h-3 bg-neutral-800  overflow-hidden">
+                <div className="h-3 bg-neutral-800 dark:bg-neutral-800 overflow-hidden rounded">
                   {/* Mock progress based on streak or logs, ideally calculated from weekly adherence */}
                   <div
                     className="h-full bg-indigo-500 transition-all duration-1000 ease-out"
@@ -372,10 +376,10 @@ const PatientHome = () => {
             </div>
 
             {/* Motivation Widget */}
-            <div className="bg-white p-6 ring-1 ring-white/10 relative overflow-hidden min-h-[160px] flex flex-col justify-center">
+            <div className="bg-white dark:bg-neutral-950 p-6 ring-1 ring-white/10 dark:ring-neutral-800 relative overflow-hidden min-h-[160px] flex flex-col justify-center shadow-sm">
               {quotes.length > 0 ? (
                 <div className="animate-in fade-in slide-in-from-right duration-700 key={currentQuoteIndex}">
-                  <p className="text-xl font-light italic text-black mb-4">
+                  <p className="text-xl font-light italic text-black dark:text-neutral-50 mb-4">
                     "{quotes[currentQuoteIndex].text}"
                   </p>
                   <div className="flex justify-between items-center text-xs text-neutral-500 uppercase tracking-wider">
@@ -415,17 +419,17 @@ const PatientHome = () => {
             {prescriptions.length > 0 ? (
               <div className="grid grid-cols-2 gap-4">
                 {/* Pill Count / Refill */}
-                <div className="bg-white p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
-                  <div className="flex items-center gap-2 mb-2 text-blue-400">
+                <div className="bg-white dark:bg-neutral-950 p-4 ring-1 ring-neutral-200 dark:ring-neutral-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2 text-blue-500 dark:text-blue-400">
                     <Clock className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-wider">
                       Details
                     </span>
                   </div>
-                  <p className="text-lg font-bold">
+                  <p className="text-lg font-bold text-neutral-900 dark:text-white">
                     {prescriptions[0].current_pills} Pills Left
                   </p>
-                  <p className="text-xs text-neutral-400 mt-1">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
                     {/* Naive refill calculation if not in backend yet */}
                     {prescriptions[0].total_pills > 0
                       ? `${Math.round((prescriptions[0].current_pills / prescriptions[0].total_pills) * 100)}% remaining`
@@ -434,14 +438,14 @@ const PatientHome = () => {
                 </div>
 
                 {/* Review Date */}
-                <div className="bg-white p-4  ring-1 ring-white/5 shadow-lg shadow-black/20">
-                  <div className="flex items-center gap-2 mb-2 text-purple-400">
+                <div className="bg-white dark:bg-neutral-950 p-4 ring-1 ring-neutral-200 dark:ring-neutral-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2 text-purple-500 dark:text-purple-400">
                     <Calendar className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-wider">
                       Review
                     </span>
                   </div>
-                  <p className="text-lg font-bold">
+                  <p className="text-lg font-bold text-neutral-900 dark:text-white">
                     {(() => {
                       // Prefer the latest viral load review date if it exists
                       const upcomingVl = viralLoads.find(
@@ -459,18 +463,20 @@ const PatientHome = () => {
                         : "Not set";
                     })()}
                   </p>
-                  <p className="text-xs text-neutral-400 mt-1">Next Check-up</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                    Next Check-up
+                  </p>
                 </div>
               </div>
             ) : (
-              <div className="bg-white p-4  ring-1 ring-white/5 shadow-lg shadow-black/20 text-neutral-500 text-sm">
+              <div className="bg-white dark:bg-neutral-950 p-4 ring-1 ring-neutral-200 dark:ring-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm shadow-sm">
                 No active prescriptions
               </div>
             )}
 
             {/* Medications List */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+              <h3 className="text-lg font-semibold flex items-center gap-2 text-neutral-900 dark:text-white">
                 <Bell className="w-4 h-4" /> Upcoming Doses
               </h3>
 
@@ -490,19 +496,19 @@ const PatientHome = () => {
                   return (
                     <div
                       key={med.id}
-                      className="bg-white  p-5 ring-1 ring-white/5 flex justify-between items-center shadow-lg shadow-black/20"
+                      className="bg-white dark:bg-neutral-950 p-5 ring-1 ring-neutral-200 dark:ring-neutral-800 shadow-sm flex justify-between items-center"
                     >
                       <div>
-                        <h4 className="font-semibold text-lg">
+                        <h4 className="font-semibold text-lg text-neutral-900 dark:text-white">
                           {med.medication_name}
                         </h4>
-                        <p className="text-neutral-400 text-sm">
+                        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
                           {med.dosage} • {med.scheduled_time}
                         </p>
                       </div>
 
                       {isTaken ? (
-                        <div className="flex items-center gap-2 text-green-400 bg-green-400/10 px-3 py-1  text-sm font-medium">
+                        <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-400/10 px-3 py-1 text-sm font-medium rounded-md">
                           <Check className="w-4 h-4" /> Taken
                         </div>
                       ) : isMissed ? (
@@ -514,18 +520,18 @@ const PatientHome = () => {
                           <button
                             onClick={() => openConfirmModal(med, todayLog)}
                             disabled={loggingMedId === med.id}
-                            className={`bg-white text-black p-2 hover:bg-neutral-200 transition ${loggingMedId === med.id ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white p-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition rounded-md ${loggingMedId === med.id ? "opacity-50 cursor-not-allowed" : ""}`}
                             title="Mark as Taken"
                           >
-                            <Check className="w-6 h-6" />
+                            <Check className="w-5 h-5" />
                           </button>
                           <button
                             onClick={() => handleLog(med, "missed", todayLog)}
                             disabled={loggingMedId === med.id}
-                            className={`bg-white text-neutral-400 p-2 ring-1 ring-neutral-700 hover:bg-neutral-700 transition ${loggingMedId === med.id ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`bg-white text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400 p-2 ring-1 ring-neutral-300 dark:ring-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition rounded-md ${loggingMedId === med.id ? "opacity-50 cursor-not-allowed" : ""}`}
                             title="Mark as Missed"
                           >
-                            <X className="w-6 h-6" />
+                            <X className="w-5 h-5" />
                           </button>
                         </div>
                       )}
@@ -535,7 +541,7 @@ const PatientHome = () => {
               </div>
 
               {medications.length === 0 && (
-                <p className="text-neutral-500 text-center py-8">
+                <p className="text-neutral-500 dark:text-neutral-400 text-center py-8">
                   No medications scheduled.
                 </p>
               )}
@@ -543,7 +549,7 @@ const PatientHome = () => {
 
             {/* Viral Load & Reviews (Read-Only) */}
             <div className="space-y-4 pt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+              <h3 className="text-lg font-semibold flex items-center gap-2 text-neutral-900 dark:text-white">
                 <Calendar className="w-4 h-4" /> Lab Results & Reviews
               </h3>
 
@@ -551,26 +557,26 @@ const PatientHome = () => {
                 {viralLoads.map((vl) => (
                   <div
                     key={vl.id}
-                    className="bg-white p-5 ring-1 ring-white/5 flex flex-col gap-2 shadow-lg shadow-black/20"
+                    className="bg-white dark:bg-neutral-950 p-5 ring-1 ring-neutral-200 dark:ring-neutral-800 flex flex-col gap-2 shadow-sm"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-semibold text-neutral-900 border-b border-neutral-100 pb-1 mb-2">
+                        <h4 className="font-semibold text-neutral-900 dark:text-white border-b border-neutral-100 dark:border-neutral-800 pb-1 mb-2">
                           Viral Load Test:{" "}
                           {new Date(vl.test_date).toLocaleDateString()}
                         </h4>
                         <div className="flex gap-4 text-sm mt-1">
                           <div className="flex flex-col">
-                            <span className="text-neutral-400 text-xs uppercase tracking-wider">
+                            <span className="text-neutral-500 dark:text-neutral-400 text-xs uppercase tracking-wider">
                               Result
                             </span>
-                            <span className="font-medium">
+                            <span className="font-medium text-neutral-900 dark:text-neutral-200">
                               {vl.viral_load_value} copies/mL
                             </span>
                           </div>
                           {vl.review && vl.review.interpretation && (
                             <div className="flex flex-col">
-                              <span className="text-neutral-400 text-xs uppercase tracking-wider">
+                              <span className="text-neutral-500 dark:text-neutral-400 text-xs uppercase tracking-wider">
                                 Status
                               </span>
                               <span
@@ -591,7 +597,7 @@ const PatientHome = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded">
+                        <span className="bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-xs font-semibold px-2.5 py-1 rounded">
                           {vl.review_date
                             ? `Next Review: ${new Date(vl.review_date).toLocaleDateString()}`
                             : "Review Pending"}
@@ -603,7 +609,7 @@ const PatientHome = () => {
               </div>
 
               {viralLoads.length === 0 && (
-                <p className="text-neutral-500 text-center py-8 border border-dashed border-neutral-200 bg-neutral-50">
+                <p className="text-neutral-500 dark:text-neutral-400 text-center py-8 border border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 rounded-md">
                   No recent lab results available.
                 </p>
               )}
