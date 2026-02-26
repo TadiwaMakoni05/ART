@@ -484,12 +484,16 @@ class AdherenceViewSet(viewsets.ModelViewSet):
             settings_obj = SystemSettings.load()
             
             now = timezone.now()
-            lower_bound = scheduled_time - datetime.timedelta(hours=settings_obj.adherence_window_before_hours)
-            upper_bound = scheduled_time + datetime.timedelta(hours=settings_obj.adherence_window_after_hours)
+            # Relaxing window to prevent timezone issues (e.g. 14 hours allows covering any local time on the same day)
+            relaxed_before_hours = max(settings_obj.adherence_window_before_hours, 14.0)
+            relaxed_after_hours = max(settings_obj.adherence_window_after_hours, 14.0)
+            
+            lower_bound = scheduled_time - datetime.timedelta(hours=relaxed_before_hours)
+            upper_bound = scheduled_time + datetime.timedelta(hours=relaxed_after_hours)
             
             if now < lower_bound or now > upper_bound:
                 return Response({
-                    "error": f"You can only mark a dose as taken within {settings_obj.adherence_window_before_hours} hour(s) before and {settings_obj.adherence_window_after_hours} hour(s) after the scheduled time."
+                    "error": f"You can only mark a dose as taken within {relaxed_before_hours} hour(s) before and {relaxed_after_hours} hour(s) after the scheduled time."
                 }, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = self.get_serializer(data=data)
@@ -509,12 +513,16 @@ class AdherenceViewSet(viewsets.ModelViewSet):
             settings_obj = SystemSettings.load()
             
             now = timezone.now()
-            lower_bound = scheduled_time - datetime.timedelta(hours=settings_obj.adherence_window_before_hours)
-            upper_bound = scheduled_time + datetime.timedelta(hours=settings_obj.adherence_window_after_hours)
+            # Relaxing window to prevent timezone issues (e.g. 14 hours allows covering any local time on the same day)
+            relaxed_before_hours = max(settings_obj.adherence_window_before_hours, 14.0)
+            relaxed_after_hours = max(settings_obj.adherence_window_after_hours, 14.0)
+            
+            lower_bound = scheduled_time - datetime.timedelta(hours=relaxed_before_hours)
+            upper_bound = scheduled_time + datetime.timedelta(hours=relaxed_after_hours)
             
             if now < lower_bound or now > upper_bound:
                 return Response({
-                    "error": f"You can only mark a dose as taken within {settings_obj.adherence_window_before_hours} hour(s) before and {settings_obj.adherence_window_after_hours} hour(s) after the scheduled time."
+                    "error": f"You can only mark a dose as taken within {relaxed_before_hours} hour(s) before and {relaxed_after_hours} hour(s) after the scheduled time."
                 }, status=status.HTTP_400_BAD_REQUEST)
                 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
