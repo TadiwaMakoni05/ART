@@ -18,6 +18,9 @@ from .serializers import (
     QuoteSerializer, PrescriptionSerializer, ViralLoadResultSerializer
 )
 from .services import generate_viral_load_review
+import os
+from google import genai
+from google.genai import types
 
 class QuoteView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -667,6 +670,66 @@ class ChatbotView(views.APIView):
             answer = "If you miss a dose, take it as soon as you remember, unless it's close to your next dose."
             
         return Response({"answer": answer})
+
+class AIChatView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if user.role != 'patient':
+            return Response({"error": "Only patients can use the AI Chat Helper"}, status=status.HTTP_403_FORBIDDEN)
+            
+        message = request.data.get('message', '').strip()
+        if not message:
+            return Response({"error": "Message is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Get GEMINI_API_KEY from environment
+        from django.conf import settings
+        
+        # Try from OS env first
+        api_key = os.environ.get("GEMINI_API_KEY")
+        print(api_key, "API KEYE----")
+        if not api_key:
+            # Fallback for local development if loaded via another mechanism
+            # We assume it's in the env since they provided one
+            pass
+            
+        if not api_key:
+            return Response({"error": "AI service is currently unavailable"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        try:
+            client = genai.Client(api_key=api_key)
+            
+            system_instruction = (
+    "You are ARTI, a friendly and supportive AI health buddy for people taking ART (antiretroviral therapy). "
+    "Your job is to help patients with simple, easy-to-understand information about health, nutrition, "
+    "taking their medication on time, and healthy daily habits. "
+    "Be warm, encouraging, and interactive. You can ask gentle follow-up questions if it helps the patient, "
+    "but keep your replies short, clear, and positive. "
+    "Never sound formal, robotic, or judgemental. "
+    "IMPORTANT SAFETY RULES: "
+    "1. Only give general and educational information. "
+    "2. Do NOT diagnose illnesses. "
+    "3. Do NOT prescribe medicine or suggest changing or stopping any treatment. "
+    "4. If the question sounds serious, urgent, or beyond general advice, kindly guide the patient to talk to a healthcare provider. "
+    "5. Do NOT use markdown formatting (like **, *, or bullet points). Respond in plain text only, with standard paragraph spacing. "
+    "Always end every reply with this exact sentence: "
+    "\\n\\n\"This information does not replace advice from your healthcare provider.\""
+)
+            
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=message,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.3
+                )
+            )
+            
+            return Response({"response": response.text})
+        except Exception as e:
+            print(f"Error in AIChatView: {e}")
+            return Response({"error": "An error occurred while communicating with the AI Helper."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = CounselingMessageSerializer

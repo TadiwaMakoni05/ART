@@ -14,6 +14,7 @@ import {
   Trophy,
 } from "lucide-react";
 import ConfirmModal from "../components/ConfirmModal";
+import AIChatHelper from "../components/AIChatHelper";
 
 const PatientHome = () => {
   const { user } = useAuth();
@@ -612,6 +613,8 @@ const PatientHome = () => {
       </main>
 
       {/* Bottom Navigation */}
+
+      <AIChatHelper />
 
       <ConfirmModal
         isOpen={modalOpen}

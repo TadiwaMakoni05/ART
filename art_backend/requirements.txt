@@ -6,3 +6,5 @@ django-cors-headers
 Pillow
 sqlparse==0.5.5
 tzdata==2025.3
+google-genai
+python-dotenv
