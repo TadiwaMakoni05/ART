@@ -1,2 +1,3 @@
 env
-.env
+art_backend/.env
+art_backend/db.sqlite3
