@@ -40,6 +40,7 @@ const LandingPage = () => {
 
   // Testimonial Slider State
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [activeAboutImage, setActiveAboutImage] = useState(0);
 
   const testimonials = [
     {
@@ -68,6 +69,14 @@ const LandingPage = () => {
     },
   ];
 
+  const aboutImages = [
+    "/pexels-artempodrez-6823392.jpg",
+    "/pexels-karola-g-4021801.jpg",
+    "/pexels-n-voitkevich-5863370.jpg",
+    "/pexels-n-voitkevich-7615574.jpg",
+    "/pexels-shvetsa-3900425.jpg",
+  ];
+
   // Auto-play testimonials slider
   // This cycles through three sample users (patients & providers) to highlight app benefits.
   useEffect(() => {
@@ -76,6 +85,14 @@ const LandingPage = () => {
     }, 5000); // 5 seconds
     return () => clearInterval(interval);
   }, [testimonials.length]);
+
+  // Auto-play about section slideshow
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveAboutImage((prev) => (prev + 1) % aboutImages.length);
+    }, 3000); // 3 seconds
+    return () => clearInterval(interval);
+  }, [aboutImages.length]);
 
   return (
     <div className="min-h-screen font-sans text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900">
@@ -230,11 +247,19 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
-              {/* Dummy Image Placeholder */}
-              <div className="aspect-square bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-none overflow-hidden shadow-2xl relative group">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Shield className="w-32 h-32 text-white opacity-50" />
-                </div>
+              {/* Slideshow of about images */}
+              <div className="aspect-square rounded-none overflow-hidden shadow-2xl relative group">
+                {aboutImages.map((src, index) => (
+                  <img
+                    key={src}
+                    src={src}
+                    alt={`About slide ${index + 1}`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                      index === activeAboutImage ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                ))}
+
                 {/* Floating Card 1 */}
                 <div className="absolute top-10 left-10 bg-white dark:bg-neutral-900 p-4 rounded-none shadow-lg animate-bounce duration-[3000ms]">
                   <div className="flex items-center gap-3">
