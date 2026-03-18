@@ -15,12 +15,23 @@ import {
   CartesianGrid,
 } from "recharts";
 
+/*
+  ProviderDashboard.jsx
+
+  Dashboard for healthcare providers.
+  - Shows overall patient counts, adherence rates, missed dose alerts.
+  - Displays charts for adherence distribution and weekly log activity.
+  - Fetches data from the provider dashboard API endpoint.
+*/
+
 const StatCard = ({ title, value, warning, icon }) => (
   <div
     className={`p-6 bg-white dark:bg-neutral-900  shadow-sm border ${warning ? "border-red-200 bg-red-50/20" : "border-neutral-200"}`}
   >
     <div className="flex justify-between items-start">
-      <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{title}</p>
+      <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+        {title}
+      </p>
       {icon}
     </div>
     <p
@@ -36,6 +47,8 @@ const ProviderDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch provider dashboard statistics on mount.
+  // Includes patient counts, adherence rates, and alert summaries.
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -77,7 +90,9 @@ const ProviderDashboard = () => {
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           Dashboard Overview
         </h1>
-        <p className="text-neutral-500 dark:text-neutral-400">Welcome back, {user?.username}.</p>
+        <p className="text-neutral-500 dark:text-neutral-400">
+          Welcome back, {user?.username}.
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -85,24 +100,32 @@ const ProviderDashboard = () => {
         <StatCard
           title="Total Patients"
           value={stats?.total_patients}
-          icon={<Users className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />}
+          icon={
+            <Users className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
+          }
         />
         <StatCard
           title="Avg Adherence"
           value={`${stats?.adherence_percentage}%`}
-          icon={<Activity className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />}
+          icon={
+            <Activity className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
+          }
         />
         <StatCard
           title="Missed Doses (7d)"
           value={stats?.missed_doses}
           warning={stats?.missed_doses > 0}
-          icon={<Calendar className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />}
+          icon={
+            <Calendar className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
+          }
         />
         <StatCard
           title="Active Alerts"
           value={stats?.alerts}
           warning={stats?.alerts > 0}
-          icon={<Bell className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />}
+          icon={
+            <Bell className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
+          }
         />
       </div>
 
@@ -134,7 +157,9 @@ const ProviderDashboard = () => {
               <span className="text-3xl font-bold">
                 {stats?.adherence_percentage}%
               </span>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Adherence</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                Adherence
+              </p>
             </div>
             <div className="mt-[100px]"></div>
           </div>

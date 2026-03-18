@@ -1,3 +1,20 @@
+"""
+ART Adherence Tracking System - API Serializers
+
+This module contains all the Django REST Framework serializers for the ART medication adherence application.
+Serializers handle data validation, transformation, and API response formatting for all models.
+
+Key serialization features:
+- User authentication with role-based data inclusion
+- Patient profile with adherence score calculation
+- Medication and prescription management
+- Adherence logging with validation
+- Messaging system with nested user data
+- Gamification data with badge and point tracking
+- Viral load results with automated review interpretation
+- Push notification subscription handling
+"""
+
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
@@ -10,12 +27,29 @@ from .models import (
 # ... (rest of imports)
 
 class QuoteSerializer(serializers.ModelSerializer):
+    """
+    Inspirational Quote Serializer
+    
+    Serializes quote data for daily motivation and wellness content.
+    Includes categorized quotes for different aspects of health.
+    """
     class Meta:
         model = Quote
         fields = '__all__'
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Custom JWT Token Serializer
+    
+    Extends the standard JWT serializer to include user role and profile information
+    in the authentication token for role-based access control.
+    
+    Features implemented:
+    - Role-based token claims
+    - Full name inclusion for display purposes
+    - Enhanced token payload for frontend use
+    """
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -49,6 +83,17 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    User Information Serializer
+    
+    Serializes user data with role-based full name resolution.
+    Provides unified user representation across different roles.
+    
+    Features implemented:
+    - Dynamic full name based on role and profile
+    - Role-based field exposure
+    - Read-only security fields
+    """
     full_name = serializers.SerializerMethodField()
 
     class Meta:
@@ -64,6 +109,18 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.username
 
 class PatientProfileSerializer(serializers.ModelSerializer):
+    """
+    Patient Profile Serializer
+    
+    Serializes patient demographic and contact information with adherence metrics.
+    Includes notification preferences and consent management.
+    
+    Features implemented:
+    - Nested user information
+    - Real-time adherence score calculation
+    - Notification preference management
+    - Consent flag handling
+    """
     user = UserSerializer(read_only=True)
     adherence_score = serializers.SerializerMethodField()
     
@@ -82,6 +139,18 @@ class PatientProfileSerializer(serializers.ModelSerializer):
         return round((taken / total) * 100, 1)
 
 class PrescriptionSerializer(serializers.ModelSerializer):
+    """
+    Prescription Serializer
+    
+    Serializes medication prescription data with date formatting.
+    Handles pill inventory tracking and prescription lifecycle.
+    
+    Features implemented:
+    - Date-only field extraction for frontend compatibility
+    - Pill count management
+    - Prescription status tracking
+    - Patient association validation
+    """
     start_date_only = serializers.SerializerMethodField()
     end_date_only = serializers.SerializerMethodField()
     review_date_only = serializers.SerializerMethodField()
@@ -107,12 +176,36 @@ class PrescriptionSerializer(serializers.ModelSerializer):
         return None
 
 class MedicationScheduleSerializer(serializers.ModelSerializer):
+    """
+    Medication Schedule Serializer
+    
+    Serializes daily medication dosing schedules.
+    Manages timing and dosage information for medication regimens.
+    
+    Features implemented:
+    - Schedule timing configuration
+    - Pill count per dose
+    - Patient association protection
+    - Schedule period management
+    """
     class Meta:
         model = MedicationSchedule
         fields = '__all__'
         read_only_fields = ['patient'] # Patient is set from context or URL
 
 class AdherenceLogSerializer(serializers.ModelSerializer):
+    """
+    Adherence Log Serializer
+    
+    Serializes medication intake logging data.
+    Handles dose status tracking and timestamp management.
+    
+    Features implemented:
+    - Dose status validation (taken/missed/snoozed)
+    - Timestamp recording
+    - Patient association protection
+    - Creation timestamp read-only
+    """
     class Meta:
         model = AdherenceLog
         fields = '__all__'
@@ -124,6 +217,18 @@ class ReportFileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CounselingMessageSerializer(serializers.ModelSerializer):
+    """
+    Counseling Message Serializer
+    
+    Serializes secure messaging between providers and patients.
+    Includes nested user data and attachment handling.
+    
+    Features implemented:
+    - Nested sender/receiver user information
+    - Message type classification
+    - File attachment support
+    - Read status tracking
+    """
     sender = UserSerializer(read_only=True)
     receiver = UserSerializer(read_only=True)
     receiver_id = serializers.PrimaryKeyRelatedField(
@@ -146,6 +251,18 @@ class AlertSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CreatePatientSerializer(serializers.Serializer):
+    """
+    Patient Creation Serializer
+    
+    Handles bulk patient creation with regimen setup.
+    Used by providers to create new patient accounts with medication schedules.
+    
+    Features implemented:
+    - Patient demographic validation
+    - Medication regimen specification
+    - Credential delivery method selection
+    - Bulk medication schedule creation
+    """
     # username is auto-generated
     full_name = serializers.CharField()
     phone = serializers.CharField()
@@ -172,6 +289,18 @@ class PointTransactionSerializer(serializers.ModelSerializer):
         fields = ['points', 'reason', 'created_at']
 
 class PatientGamificationProfileSerializer(serializers.ModelSerializer):
+    """
+    Gamification Profile Serializer
+    
+    Serializes patient gamification data including points and streaks.
+    Includes latest badge information for achievement display.
+    
+    Features implemented:
+    - Point accumulation tracking
+    - Streak monitoring
+    - Latest badge inclusion
+    - Achievement progress display
+    """
     latest_badge = serializers.SerializerMethodField()
 
     class Meta:
@@ -195,6 +324,18 @@ class ViralLoadReviewSerializer(serializers.ModelSerializer):
         return obj.generate_interpretation()
 
 class ViralLoadResultSerializer(serializers.ModelSerializer):
+    """
+    Viral Load Result Serializer
+    
+    Serializes HIV viral load test results with automated review data.
+    Includes nested review information with interpretation.
+    
+    Features implemented:
+    - Viral load value tracking
+    - Test date recording
+    - Nested review with interpretation
+    - Provider entry tracking
+    """
     review = ViralLoadReviewSerializer(read_only=True)
     
     class Meta:
@@ -204,6 +345,17 @@ class ViralLoadResultSerializer(serializers.ModelSerializer):
 
 
 class PushSubscriptionSerializer(serializers.ModelSerializer):
+    """
+    Push Notification Subscription Serializer
+    
+    Serializes Web Push API subscription data for browser notifications.
+    Handles endpoint, P256DH key, and auth key management.
+    
+    Features implemented:
+    - Web Push API key storage
+    - Subscription endpoint management
+    - User association handling
+    """
     class Meta:
         model = PushSubscription
         fields = ['endpoint', 'p256dh', 'auth']

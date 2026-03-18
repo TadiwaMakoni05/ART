@@ -15,6 +15,18 @@ import {
   Download,
 } from "lucide-react";
 
+/*
+  Messenger.jsx
+
+  Real-time messaging interface for patients and providers.
+  Features:
+  - Polls for new messages every few seconds.
+  - Marks messages as read when viewing a conversation.
+  - Supports sending text and image messages.
+  - Includes offline message fallback (queued locally).
+  - Allows providers to generate adherence reports directly from chat.
+*/
+
 const Messenger = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -26,7 +38,8 @@ const Messenger = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Poll for messages
+  // Poll for messages periodically and mark relevant messages as read.
+  // This keeps the chat interface up-to-date without requiring a websocket.
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -112,12 +125,14 @@ const Messenger = () => {
     );
   });
 
+  // Scroll to the bottom of the active conversation when new messages appear.
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeMessages]);
 
   useEffect(() => {
-    // Fetch eligible partners (Patients for Provider, Provider for Patient)
+    // Load conversation partners on mount.
+    // Providers see their patients, patients see their primary provider(s).
     const fetchPartners = async () => {
       try {
         if (user.role === "provider") {

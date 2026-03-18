@@ -19,6 +19,15 @@ import {
   Eye,
 } from "lucide-react";
 
+/*
+  Settings.jsx
+
+  User settings dashboard.
+  - Provides profile editing, security (password change), and notification preferences.
+  - Renders different tabs based on user role (patient/provider/admin).
+  - Uses mock state and timeouts for demo purposes; replace with real API calls as needed.
+*/
+
 const Settings = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
@@ -50,13 +59,15 @@ const Settings = () => {
     twoFactor: false,
   });
 
+  // Handle updating profile information. Currently mocked with a timeout.
+  // Replace with a real API call to persist changes to the user profile.
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccessMsg("");
     try {
       // Assuming endpoint exists or mocking it
-      // await api.put(\`/users/\${user.id}/\`, profileData);
+      // await api.put(`/users/${user.id}/`, profileData);
       setTimeout(() => {
         setSuccessMsg("Profile updated successfully!");
         setLoading(false);
@@ -67,6 +78,8 @@ const Settings = () => {
     }
   };
 
+  // Handle password changes. This is currently mocked but shows where an API call would happen.
+  // Validates passwords match before attempting to send a request.
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -127,7 +140,9 @@ const Settings = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-8 text-neutral-900 dark:text-neutral-100">Settings</h1>
+      <h1 className="text-3xl font-bold mb-8 text-neutral-900 dark:text-neutral-100">
+        Settings
+      </h1>
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar / Tabs */}
@@ -374,7 +389,9 @@ const Settings = () => {
                   >
                     <div>
                       <p className="font-medium">{item.label}</p>
-                      <p className="text-sm text-neutral-500 dark:text-neutral-400">{item.desc}</p>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                        {item.desc}
+                      </p>
                     </div>
                     <button
                       onClick={() => toggleSetting(item.key)}

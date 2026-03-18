@@ -1,3 +1,24 @@
+"""
+ART Adherence Tracking System - API Views
+
+This module contains all the REST API views for the ART medication adherence tracking application.
+It provides endpoints for user management, patient data, medication tracking, adherence logging,
+provider dashboards, messaging, gamification, and administrative functions.
+
+Key API endpoints and features:
+- User authentication and role-based access (patient/provider/admin)
+- Patient profile and medication regimen management
+- Real-time adherence logging with time window validation
+- Provider dashboards with adherence analytics
+- Secure messaging between providers and patients
+- Push notification subscriptions
+- Gamification system with points, badges, and streaks
+- Viral load monitoring and automated reviews
+- Report generation and file downloads
+- AI-powered health assistant for patients
+- Administrative system management
+"""
+
 from rest_framework import viewsets, status, permissions, generics, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -23,6 +44,17 @@ from google import genai
 from google.genai import types
 
 class QuoteView(views.APIView):
+    """
+    Inspirational Quotes API View
+    
+    Provides daily inspirational quotes for patient motivation and engagement.
+    Supports both daily quote rotation and full quote library access.
+    
+    Features implemented:
+    - Deterministic daily quote selection based on date
+    - Categorized quotes (mental, physical, emotional, spiritual)
+    - Random sampling for daily variety
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -68,6 +100,18 @@ class QuoteView(views.APIView):
         return Response(serializer.data)
 
 class AnalyticsView(views.APIView):
+    """
+    Patient Analytics API View
+    
+    Provides comprehensive adherence analytics and trends for individual patients.
+    Generates charts and statistics for adherence tracking and improvement.
+    
+    Features implemented:
+    - Daily adherence trends (last 7 days)
+    - Weekly adherence percentages (last 4 weeks)
+    - Overall adherence statistics (taken/missed/snoozed counts)
+    - Visual data for patient progress tracking
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -154,9 +198,21 @@ import string
 import re
 
 class MyTokenObtainPairView(TokenObtainPairView):
+    """
+    Custom JWT Token Authentication View
+    
+    Extends the standard JWT token view with custom serializer
+    for enhanced authentication features.
+    """
     serializer_class = MyTokenObtainPairSerializer
 
 def generate_username(full_name):
+    """
+    Generate unique username from patient's full name.
+    
+    Creates a normalized username (e.g., john.doe) with numeric suffix
+    if conflicts exist, ensuring unique user identification.
+    """
     # Normalize name: John Doe -> john.doe
     base = full_name.lower().strip()
     base = re.sub(r'[^a-z0-9]', '.', base)
@@ -170,10 +226,29 @@ def generate_username(full_name):
     return username
 
 def generate_random_password():
+    """
+    Generate secure random password for new patient accounts.
+    
+    Creates a 10-character password with mixed case, numbers, and symbols
+    for initial account security.
+    """
     chars = string.ascii_letters + string.digits + "!@#$%"
     return ''.join(random.choice(chars) for _ in range(10))
 
 class PatientViewSet(viewsets.ModelViewSet):
+    """
+    Patient Management API ViewSet
+    
+    Handles patient profile CRUD operations and provider-patient relationships.
+    Includes automated patient creation with credentials generation.
+    
+    Features implemented:
+    - Role-based access control (providers create/manage patients)
+    - Automated username/password generation for new patients
+    - Medication regimen setup during patient creation
+    - Provider-patient linkage management
+    - Adherence report generation for providers
+    """
     serializer_class = PatientProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -280,6 +355,18 @@ class PatientViewSet(viewsets.ModelViewSet):
         return Response({"status": "Adherence report generated and sent.", "message_id": message.id}, status=status.HTTP_201_CREATED)
 
 class PrescriptionViewSet(viewsets.ModelViewSet):
+    """
+    Prescription Management API ViewSet
+    
+    Manages medication prescriptions with role-based access.
+    Providers can create prescriptions for their patients.
+    
+    Features implemented:
+    - Prescription CRUD operations
+    - Patient-specific prescription filtering
+    - Provider authorization validation
+    - Pill inventory tracking
+    """
     serializer_class = PrescriptionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -313,6 +400,18 @@ class PrescriptionViewSet(viewsets.ModelViewSet):
              raise serializers.ValidationError({"error": "Not authorized"})
 
 class MedicationViewSet(viewsets.ModelViewSet):
+    """
+    Medication Schedule Management API ViewSet
+    
+    Handles medication dosing schedules and timing.
+    Manages the daily medication regimens for patients.
+    
+    Features implemented:
+    - Medication schedule CRUD operations
+    - Patient-specific schedule filtering
+    - Provider authorization for schedule management
+    - Dose timing and frequency configuration
+    """
     serializer_class = MedicationScheduleSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -345,6 +444,19 @@ class MedicationViewSet(viewsets.ModelViewSet):
              raise serializers.ValidationError({"error": "Not authorized"})
 
 class ViralLoadResultViewSet(viewsets.ModelViewSet):
+    """
+    Viral Load Results Management API ViewSet
+    
+    Manages HIV viral load test results and automated analysis.
+    Providers enter results which trigger automated reviews and reports.
+    
+    Features implemented:
+    - Viral load result entry and management
+    - Automated viral load review generation
+    - Provider-only result entry authorization
+    - Automatic report creation and messaging
+    - Treatment effectiveness analysis
+    """
     serializer_class = ViralLoadResultSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -397,6 +509,20 @@ class ViralLoadResultViewSet(viewsets.ModelViewSet):
              raise serializers.ValidationError({"patient": "Invalid patient ID or not linked to you."})
 
 class AdherenceViewSet(viewsets.ModelViewSet):
+    """
+    Adherence Logging API ViewSet
+    
+    Core functionality for tracking medication intake.
+    Handles dose logging with time window validation and automatic dose generation.
+    
+    Features implemented:
+    - Real-time adherence logging (taken/missed/snoozed)
+    - Time window validation for dose marking
+    - Automatic daily dose generation for patients
+    - Date range filtering for historical data
+    - Provider access to patient adherence data
+    - Adherence streak and pattern tracking
+    """
     serializer_class = AdherenceLogSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -534,6 +660,19 @@ class AdherenceViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class ProviderDashboardView(views.APIView):
+    """
+    Provider Dashboard Analytics API View
+    
+    Provides comprehensive analytics and metrics for healthcare providers
+    to monitor their patients' adherence and system status.
+    
+    Features implemented:
+    - Patient count and adherence percentages
+    - Missed dose alerts and active alerts count
+    - Daily adherence trends across all patients
+    - Provider-specific data filtering
+    - Real-time dashboard metrics
+    """
     permission_classes = [IsProvider]
 
     def get(self, request):
@@ -598,6 +737,18 @@ class ProviderDashboardView(views.APIView):
         return Response(data)
 
 class SyncDataView(views.APIView):
+    """
+    Offline Data Synchronization API View
+    
+    Handles synchronization of adherence logs and messages from offline-capable clients.
+    Prevents duplicate entries and ensures data consistency.
+    
+    Features implemented:
+    - Adherence log synchronization for patients
+    - Message synchronization for all users
+    - Duplicate prevention logic
+    - Offline-first data handling
+    """
     permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request):
@@ -655,6 +806,17 @@ class SyncDataView(views.APIView):
         return Response({"synced": synced_counts}, status=status.HTTP_200_OK)
 
 class ChatbotView(views.APIView):
+    """
+    Simple Rule-Based Chatbot API View
+    
+    Provides basic health information through predefined responses.
+    Acts as a first-line information resource for patients.
+    
+    Features implemented:
+    - Rule-based question matching
+    - Common health topics (side effects, nutrition, missed doses)
+    - Safety disclaimers and provider referral guidance
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -672,6 +834,19 @@ class ChatbotView(views.APIView):
         return Response({"answer": answer})
 
 class AIChatView(views.APIView):
+    """
+    AI-Powered Health Assistant API View
+    
+    Advanced conversational AI using Google's Gemini for personalized health guidance.
+    Provides intelligent responses while maintaining medical safety protocols.
+    
+    Features implemented:
+    - Natural language processing for health questions
+    - Context-aware responses about ART and wellness
+    - Safety protocols preventing medical advice
+    - Patient-only access with healthcare provider disclaimers
+    - Integration with Google Gemini AI model
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -732,6 +907,19 @@ class AIChatView(views.APIView):
             return Response({"error": "An error occurred while communicating with the AI Helper."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class MessageViewSet(viewsets.ModelViewSet):
+    """
+    Counseling Messages API ViewSet
+    
+    Manages secure messaging between providers and patients.
+    Supports text messages, images, and report attachments.
+    
+    Features implemented:
+    - Real-time messaging system
+    - Message read status tracking
+    - Image and file attachment support
+    - Provider-patient communication security
+    - Message threading and history
+    """
     serializer_class = CounselingMessageSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -757,12 +945,36 @@ class MessageViewSet(viewsets.ModelViewSet):
         return Response({"status": "marked as read"})
 
 class ProviderViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Provider Directory API ViewSet
+    
+    Provides read-only access to provider user information.
+    Allows patients and admins to view available providers.
+    
+    Features implemented:
+    - Provider contact information access
+    - Role-based provider filtering
+    - Secure provider data exposure
+    """
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.filter(role='provider')
 
 
 class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Gamification System API ViewSet
+    
+    Manages patient engagement through points, badges, and achievements.
+    Provides gamification data for patient motivation and progress tracking.
+    
+    Features implemented:
+    - Point and badge tracking
+    - Achievement history and summaries
+    - Weekly consistency badges
+    - Streak monitoring and rewards
+    - Patient engagement analytics
+    """
     permission_classes = [permissions.IsAuthenticated] # Or IsPatient
 
     def get_queryset(self):
@@ -829,6 +1041,18 @@ class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
 # -------------------------------------------------------------------------
 
 class AdminDashboardView(views.APIView):
+    """
+    Administrative Dashboard API View
+    
+    Provides system-wide analytics and management metrics for administrators.
+    Offers comprehensive oversight of the entire ART adherence system.
+    
+    Features implemented:
+    - System-wide user statistics
+    - Global adherence metrics
+    - Recent user activity tracking
+    - Administrative oversight tools
+    """
     permission_classes = [permissions.IsAuthenticated, IsAdmin]
 
     def get(self, request):
@@ -862,6 +1086,18 @@ class AdminDashboardView(views.APIView):
         return Response(data)
 
 class AdminUserViewSet(viewsets.ModelViewSet):
+    """
+    Administrative User Management API ViewSet
+    
+    Complete user management system for administrators.
+    Handles user creation, updates, and profile management across all roles.
+    
+    Features implemented:
+    - Full CRUD operations for all user types
+    - Password management and reset
+    - Automatic profile creation for new patients
+    - Role-based user administration
+    """
     permission_classes = [permissions.IsAuthenticated, IsAdmin]
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
@@ -892,6 +1128,18 @@ from django.shortcuts import get_object_or_404
 from .models import ReportFile
 
 class DownloadReportView(views.APIView):
+    """
+    Report File Download API View
+    
+    Secure file download endpoint for adherence and viral load reports.
+    Ensures proper authorization before allowing report access.
+    
+    Features implemented:
+    - Secure report file downloads
+    - Role-based access control (patient/provider/admin)
+    - File permission validation
+    - Attachment-style file serving
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
@@ -917,6 +1165,18 @@ from .serializers import PushSubscriptionSerializer
 from .models import PushSubscription
 
 class PushSubscribeView(views.APIView):
+    """
+    Push Notification Subscription API View
+    
+    Manages browser push notification subscriptions for real-time alerts.
+    Handles Web Push API subscription storage and updates.
+    
+    Features implemented:
+    - Web Push API subscription management
+    - P256DH and auth key storage
+    - Endpoint deduplication and updates
+    - Real-time notification delivery setup
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):

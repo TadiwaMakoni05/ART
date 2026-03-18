@@ -16,6 +16,18 @@ import {
 import ConfirmModal from "../components/ConfirmModal";
 import AIChatHelper from "../components/AIChatHelper";
 
+/*
+  PatientHome.jsx
+
+  Main dashboard for patients. Responsibilities:
+  - Fetch patient-centric data (medications, adherence logs, gamification summary,
+    motivational quotes, prescriptions, viral load results).
+  - Handle push notification subscription and local reminder polling.
+  - Provide a UI for marking doses as taken/missed with confirmation.
+  - Display gamification points/streaks and motivational quotes.
+  - Show summary of upcoming doses, prescription status, and lab results.
+*/
+
 const PatientHome = () => {
   const { user } = useAuth();
   const [medications, setMedications] = useState([]);
@@ -47,6 +59,9 @@ const PatientHome = () => {
 
   const [loggingMedId, setLoggingMedId] = useState(null);
 
+  // Fetch all required patient dashboard data in parallel.
+  // This includes medications, adherence logs, gamification summary, motivational quotes, prescriptions, and viral load results.
+  // Data is re-fetched when the component mounts and after certain actions (e.g., logging a dose).
   const fetchData = async () => {
     try {
       const [medRes, logRes, gameRes, quoteRes, prescRes, vlRes] =
@@ -75,6 +90,8 @@ const PatientHome = () => {
   };
 
   // Helper to convert VAPID key
+  // Convert a base64 VAPID key to a Uint8Array. This is required by the browser PushManager API.
+  // Source: MDN Web Docs (Web Push API).
   const urlB64ToUint8Array = (base64String) => {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding)
@@ -88,6 +105,8 @@ const PatientHome = () => {
     return outputArray;
   };
 
+  // Register the user for web push notifications via the service worker.
+  // The backend stores the subscription so it can send reminders/alerts later.
   const subscribeUserToPush = async () => {
     if ("serviceWorker" in navigator && "PushManager" in window) {
       try {
@@ -106,7 +125,7 @@ const PatientHome = () => {
           applicationServerKey: convertedVapidKey,
         });
 
-        // Send to backend
+        // Send subscription details to the backend so it can trigger push notifications.
         const subData = JSON.parse(JSON.stringify(subscription));
         await api.post("push/subscribe/", {
           endpoint: subData.endpoint,
@@ -136,7 +155,9 @@ const PatientHome = () => {
     }
   }, []);
 
-  // Poll for reminders every 10 seconds
+  // Poll for reminders every 10 seconds.
+  // This keeps the UI responsive and triggers notifications when it is time to take medication.
+  // It also auto-marks doses as missed if the window passes without user interaction.
   useEffect(() => {
     const checkReminders = () => {
       const now = new Date();
@@ -235,7 +256,7 @@ const PatientHome = () => {
     return () => clearInterval(interval);
   }, [medications, logs, lastNotifiedTime]);
 
-  // Rotate quotes every 30 seconds
+  // Rotate motivational quotes every 30 seconds to keep content fresh.
   useEffect(() => {
     if (quotes.length === 0) return;
 
@@ -246,25 +267,30 @@ const PatientHome = () => {
     return () => clearInterval(interval);
   }, [quotes]);
 
+  // Handle marking a dose as taken or missed.
+  // - Updates an existing adherence log if it exists.
+  // - Creates a new log as a fallback (important for online/offline reconciliation).
+  // - Refreshes gamification summary and prescription pill counts when a dose is taken.
+  // - Shows a UI animation when points are awarded.
   const handleLog = async (med, status, existingLog, isAuto = false) => {
     if (loggingMedId === med.id) return;
     setLoggingMedId(med.id);
 
     try {
       let res;
-      // If we have a scheduled log, we update it
+      // If we have a scheduled log, update it
       if (existingLog && existingLog.id) {
         res = await api.patch(`adherence/${existingLog.id}/`, {
           status: status,
           actual_time: new Date().toISOString(),
         });
-        // Update local state by replacing the log
+        // Update local state by replacing the updated log
         setLogs((prevLogs) =>
           prevLogs.map((l) => (l.id === existingLog.id ? res.data : l)),
         );
       } else {
         // Create new log (fallback)
-        // Construct scheduled time for today based on med time
+        // Construct scheduled time for today based on medicine schedule
         const now = new Date();
         const [hours, minutes] = med.scheduled_time.split(":");
         const scheduledTime = new Date(
@@ -284,15 +310,16 @@ const PatientHome = () => {
         setLogs((prevLogs) => [...prevLogs, res.data]);
       }
 
-      // Refresh gamification data to show updated points/streak
+      // If the user marked a dose as taken, refresh gamification and prescription data.
       if (status === "taken") {
         const gameRes = await api.get("gamification/summary/");
         setGamification(gameRes.data);
 
-        // Refresh prescriptions to update pill count
+        // Refresh prescriptions to update pill count and refill reminders.
         const prescRes = await api.get("prescriptions/");
         setPrescriptions(prescRes.data);
 
+        // Trigger a small XP animation for positive feedback.
         setShowAnimation(true);
         setTimeout(() => setShowAnimation(false), 2000);
       }
@@ -309,17 +336,20 @@ const PatientHome = () => {
       }
     } finally {
       if (!isAuto) setLoggingMedId(null);
-      // for auto, we can reset immediately too
+      // Reset logging state even for auto updates.
       setLoggingMedId(null);
     }
   };
 
+  // Open modal to confirm that the patient actually took the dose.
+  // This reduces accidental logging and encourages conscious adherence.
   const openConfirmModal = (med, todayLog) => {
     setModalMed(med);
     setModalTodayLog(todayLog);
     setModalOpen(true);
   };
 
+  // Handler when the patient confirms they took the dose.
   const handleConfirmTaken = () => {
     if (modalMed) {
       handleLog(modalMed, "taken", modalTodayLog);
@@ -329,12 +359,14 @@ const PatientHome = () => {
     setModalTodayLog(null);
   };
 
+  // Close the confirmation modal without recording a dose.
   const handleCancelTaken = () => {
     setModalOpen(false);
     setModalMed(null);
     setModalTodayLog(null);
   };
 
+  // Show a skeleton loader while we fetch patient dashboard data.
   if (loading) {
     return (
       <div className="p-4 md:p-8 space-y-6 max-w-6xl mx-auto w-full">
@@ -355,6 +387,7 @@ const PatientHome = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header: Greeting and basic navigation context */}
       <header className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
           Patient Dashboard
@@ -363,6 +396,7 @@ const PatientHome = () => {
           Welcome back, {user?.full_name || user?.username}
         </p>
       </header>
+      {/* Main dashboard content: 3-column responsive layout */}
       <main className="p-4 w-full mx-auto space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Left Column: Stats & Motivation */}
@@ -673,8 +707,10 @@ const PatientHome = () => {
 
       {/* Bottom Navigation */}
 
+      {/* Floating AI chat helper for quick questions and support */}
       <AIChatHelper />
 
+      {/* Confirmation dialog for marking doses (taken/missed) */}
       <ConfirmModal
         isOpen={modalOpen}
         onClose={handleCancelTaken}

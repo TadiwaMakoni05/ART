@@ -24,6 +24,17 @@ import {
 
 import ThemeToggle from "../components/ThemeToggle";
 
+/*
+  LandingPage.jsx
+
+  Public landing page for the ART Companion web app.
+  Includes:
+  - Hero section with call-to-action and account login.
+  - Feature highlights and testimonials carousel.
+  - Responsive navigation (desktop + mobile menu).
+  - Contact section with social links.
+*/
+
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -57,7 +68,8 @@ const LandingPage = () => {
     },
   ];
 
-  // Auto-play testimonials
+  // Auto-play testimonials slider
+  // This cycles through three sample users (patients & providers) to highlight app benefits.
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveTestimonial((prev) => (prev + 1) % testimonials.length);

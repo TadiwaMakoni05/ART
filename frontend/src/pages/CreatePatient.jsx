@@ -11,6 +11,15 @@ import {
   ArrowRight,
 } from "lucide-react";
 
+/*
+  CreatePatient.jsx
+
+  Allows providers to register a new patient account.
+  - Creates patient and returns temporary credentials.
+  - Provides quick sharing options (SMS/WhatsApp/Call) to deliver login details.
+  - Displays a confirmation screen with copy-to-clipboard support.
+*/
+
 const CreatePatient = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -37,6 +46,8 @@ const CreatePatient = () => {
   const addMedication = () =>
     setRegimen([...regimen, { medication_name: "", dosage: "", time: "" }]);
 
+  // Submit new patient registration to the backend.
+  // Backend responds with generated credentials which can be shared with the patient.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -227,7 +238,9 @@ const CreatePatient = () => {
                 className="flex flex-col md:flex-row gap-2 mb-2 md:items-end"
               >
                 <div className="flex-1">
-                  <label className="text-xs text-neutral-500 dark:text-neutral-400">Medication</label>
+                  <label className="text-xs text-neutral-500 dark:text-neutral-400">
+                    Medication
+                  </label>
                   <input
                     value={med.medication_name}
                     onChange={(e) =>

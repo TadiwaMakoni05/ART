@@ -10,6 +10,15 @@ import {
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
+/*
+  Learn.jsx
+
+  Educational and motivational content module:
+  - Shows articles and quotes across categories (health, spiritual, lifestyle).
+  - Fetches dynamic quotes from backend and merges with static items.
+  - Allows category filtering.
+*/
+
 const Learn = () => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("all");
@@ -52,7 +61,7 @@ const Learn = () => {
     },
   ]);
 
-  // Fetch quotes from API
+  // Fetch motivational quotes from the backend and merge with static article items.
   useEffect(() => {
     const fetchQuotes = async () => {
       try {

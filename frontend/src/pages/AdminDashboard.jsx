@@ -14,11 +14,23 @@ import {
   CartesianGrid,
 } from "recharts";
 
+/*
+  AdminDashboard.jsx
+
+  System-level dashboard for administrators.
+  - Shows key metrics such as total patients/providers, system adherence, and alerts.
+  - Includes trend charts and recent audit/activity logs.
+*/
+
 const StatCard = ({ title, value, icon, color }) => (
   <div className="bg-white dark:bg-neutral-900 p-6  shadow-sm border border-neutral-200 flex items-start justify-between">
     <div>
-      <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{title}</p>
-      <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{value}</h3>
+      <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">
+        {title}
+      </p>
+      <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+        {value}
+      </h3>
     </div>
     <div className={`p-3  ${color}`}>{icon}</div>
   </div>
@@ -28,6 +40,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch stats for the admin dashboard on mount.
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -86,8 +99,12 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">System Overview</h1>
-        <p className="text-neutral-500 dark:text-neutral-400">Welcome back, Administrator.</p>
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+          System Overview
+        </h1>
+        <p className="text-neutral-500 dark:text-neutral-400">
+          Welcome back, Administrator.
+        </p>
       </div>
 
       {/* Stats Grid */}
@@ -145,7 +162,9 @@ const AdminDashboard = () => {
               <span className="text-3xl font-bold">
                 {stats?.system_adherence}%
               </span>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Average</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                Average
+              </p>
             </div>
             {/* Push content down after absolute centering hack */}
             <div className="mt-[100px]"></div>
@@ -193,8 +212,12 @@ const AdminDashboard = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2  bg-blue-500"></div>
-                <p className="font-medium text-neutral-900 dark:text-neutral-100">{log.action}</p>
-                <span className="text-neutral-500 dark:text-neutral-400 text-sm">({log.target})</span>
+                <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                  {log.action}
+                </p>
+                <span className="text-neutral-500 dark:text-neutral-400 text-sm">
+                  ({log.target})
+                </span>
               </div>
               <span className="text-sm text-neutral-400">
                 {new Date(log.timestamp).toLocaleDateString()}

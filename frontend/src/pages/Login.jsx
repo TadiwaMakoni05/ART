@@ -3,6 +3,14 @@ import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
 
+/*
+  Login.jsx
+
+  Authentication screen for ART Companion.
+  - Collects username/password and calls auth context login.
+  - Redirects to role-specific dashboard (patient/provider/admin).
+*/
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -10,6 +18,7 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Handle login form submission and route user based on role.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

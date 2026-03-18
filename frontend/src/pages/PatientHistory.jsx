@@ -9,6 +9,14 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+/*
+  PatientHistory.jsx
+
+  Shows the patient's medication adherence history.
+  - Users can filter by date range and status (taken/missed/snoozed).
+  - Displays a responsive table on larger screens and cards on mobile.
+*/
+
 const PatientHistory = () => {
   const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
@@ -17,6 +25,7 @@ const PatientHistory = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  // Fetch adherence history from the server (supports optional date range filters).
   const fetchHistory = useCallback(async () => {
     setLoading(true);
     try {

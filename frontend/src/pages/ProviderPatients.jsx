@@ -4,11 +4,21 @@ import { Plus, Search, Phone, MessageSquare } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { AdherenceBadge } from "../components/AdherenceBadge";
 
+/*
+  ProviderPatients.jsx
+
+  Shows the provider's list of patients.
+  - Fetches patient list from backend.
+  - Displays adherence status and quick actions (call/message/view).
+  - Includes a create-patient flow.
+*/
+
 const ProviderPatients = () => {
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch list of patients assigned to this provider on mount.
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -43,8 +53,12 @@ const ProviderPatients = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Patients</h2>
-          <p className="text-neutral-500 dark:text-neutral-400">Manage your patient list</p>
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+            Patients
+          </h2>
+          <p className="text-neutral-500 dark:text-neutral-400">
+            Manage your patient list
+          </p>
         </div>
         <button
           onClick={() => navigate("/provider/patients/new")}
@@ -60,7 +74,9 @@ const ProviderPatients = () => {
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-200">
               <tr>
-                <th className="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400">Name</th>
+                <th className="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400">
+                  Name
+                </th>
                 <th className="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400">
                   Phone
                 </th>
@@ -74,7 +90,10 @@ const ProviderPatients = () => {
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {patients.map((patient) => (
-                <tr key={patient.id} className="hover:bg-neutral-50 dark:bg-neutral-950 transition">
+                <tr
+                  key={patient.id}
+                  className="hover:bg-neutral-50 dark:bg-neutral-950 transition"
+                >
                   <td className="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100">
                     {patient.full_name}
                   </td>

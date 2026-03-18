@@ -13,6 +13,15 @@ import {
 } from "lucide-react";
 import ConfirmModal from "../components/ConfirmModal";
 
+/*
+  AdminUsers.jsx
+
+  User management UI for administrators.
+  - Can create/edit/delete users with roles (patient/provider).
+  - Includes search, filtering, and confirmation modals.
+  - Uses backend admin endpoints for user CRUD operations.
+*/
+
 const AdminUsers = ({ role }) => {
   // role = 'patient' or 'provider'
   const [users, setUsers] = useState([]);
@@ -29,6 +38,7 @@ const AdminUsers = ({ role }) => {
     role: role,
   });
 
+  // Reload users list whenever role changes (patient/provider)
   useEffect(() => {
     fetchUsers();
   }, [role]);
@@ -48,6 +58,8 @@ const AdminUsers = ({ role }) => {
     }
   }, [isModalOpen, role]);
 
+  // Fetch all users and filter client-side by role (patient/provider).
+  // Assumes the backend returns a full user list on the admin endpoint.
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -62,6 +74,7 @@ const AdminUsers = ({ role }) => {
     }
   };
 
+  // Create or update a user record based on whether we are editing an existing user.
   const handleSave = async (e) => {
     e.preventDefault();
     try {
@@ -91,6 +104,7 @@ const AdminUsers = ({ role }) => {
     setIsDeleteModalOpen(true);
   };
 
+  // Deletes the selected user after confirmation.
   const handleDelete = async () => {
     if (!userToDelete) return;
     try {
@@ -104,11 +118,9 @@ const AdminUsers = ({ role }) => {
     }
   };
 
+  // Prefill the form for editing an existing user.
+  // Password is intentionally left blank (no change) since it is not returned by the API.
   const openEdit = (user) => {
-    // For editing, we might need to fetch profile details if they aren't in the user object
-    // But AdminUserViewSet should ideally return them.
-    // For now, we'll assume basic fields.
-    // Note: Passwords usually aren't returned.
     setFormData({
       username: user.username,
       password: "", // Leave blank to keep unchanged
@@ -195,7 +207,10 @@ const AdminUsers = ({ role }) => {
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-neutral-50 dark:bg-neutral-950 transition">
+                <tr
+                  key={user.id}
+                  className="hover:bg-neutral-50 dark:bg-neutral-950 transition"
+                >
                   <td className="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100">
                     {user.username}
                   </td>
@@ -251,7 +266,9 @@ const AdminUsers = ({ role }) => {
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-neutral-900 dark:text-neutral-100">{user.username}</h3>
+                <h3 className="font-bold text-neutral-900 dark:text-neutral-100">
+                  {user.username}
+                </h3>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
                   Created: {new Date(user.created_at).toLocaleDateString()}
                 </p>

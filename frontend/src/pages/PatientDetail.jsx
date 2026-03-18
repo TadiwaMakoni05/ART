@@ -13,6 +13,15 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+/*
+  PatientDetail.jsx
+
+  Provider-facing interface for managing a single patient's profile.
+  - Displays medication regimen, adherence log, and viral load history.
+  - Enables editing patient details and medication schedules.
+  - Supports viral load CRUD operations with review annotations.
+*/
+
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -40,6 +49,8 @@ const PatientDetail = () => {
     time: "08:00",
   });
 
+  // Keep the edit form in sync with the loaded patient profile.
+  // When patient data is loaded/updated, prefill the edit form.
   useEffect(() => {
     if (patient) {
       setEditFormData({
@@ -237,6 +248,7 @@ const PatientDetail = () => {
     }
   };
 
+  // Load all patient-related data (profile, regimen, adherence logs, viral loads) when the page mounts.
   useEffect(() => {
     const fetchPatient = async () => {
       try {
@@ -280,7 +292,9 @@ const PatientDetail = () => {
   }
   if (!patient)
     return (
-      <div className="p-8 text-center text-neutral-500 dark:text-neutral-400">Patient not found</div>
+      <div className="p-8 text-center text-neutral-500 dark:text-neutral-400">
+        Patient not found
+      </div>
     );
 
   // Calculate Adherence Stats
@@ -338,7 +352,9 @@ const PatientDetail = () => {
               </div>
             </div>
             <div className="text-left md:text-right w-full md:w-auto">
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Overall Adherence</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                Overall Adherence
+              </p>
               <p
                 className={`text-3xl font-bold ${
                   adherenceRate >= 85
@@ -479,7 +495,9 @@ const PatientDetail = () => {
                 </li>
               ))}
               {regimen.length === 0 && (
-                <p className="text-neutral-500 dark:text-neutral-400 text-sm">No active regimen.</p>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+                  No active regimen.
+                </p>
               )}
             </ul>
           </div>
@@ -660,7 +678,9 @@ const PatientDetail = () => {
                 </li>
               ))}
               {logs.length === 0 && (
-                <p className="text-neutral-500 dark:text-neutral-400 text-sm">No logs yet.</p>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+                  No logs yet.
+                </p>
               )}
             </ul>
           </div>

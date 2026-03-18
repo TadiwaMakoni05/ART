@@ -1,4 +1,17 @@
 
+"""
+ART Adherence Tracking System - Utility Functions
+
+This module contains core business logic utilities for the ART medication adherence system.
+It handles automated dose scheduling, gamification badge awarding, and adherence calculations.
+
+Key Features Implemented:
+- Daily dose generation from medication schedules
+- Weekly consistency badge calculation and awarding
+- Point system management for patient engagement
+- Automated adherence tracking and rewards
+"""
+
 from django.utils import timezone
 from .models import MedicationSchedule, AdherenceLog, Prescription
 import datetime
@@ -7,6 +20,16 @@ def generate_daily_doses(patient_profile, target_date=None):
     """
     Generates 'scheduled' AdherenceLog entries for a patient for a specific date
     based on their active Prescriptions.
+    
+    This function ensures that patients have scheduled dose entries for tracking,
+    creating them automatically from their medication schedules. It's called
+    when patients view their dashboard or when checking adherence.
+    
+    Features implemented:
+    - Active prescription filtering by date ranges
+    - Duplicate prevention for existing logs
+    - Scheduled time calculation combining date and time
+    - Automatic log creation for tracking
     """
     if target_date is None:
         target_date = timezone.now().date()
@@ -58,6 +81,17 @@ def check_weekly_badges(patient_profile):
     """
     Checks if the patient earned a badge for the LAST completed week (Mon-Sun).
     Should be called periodically or when viewing rewards.
+    
+    This function implements the gamification system by calculating weekly adherence
+    rates and awarding badges (gold/silver/bronze) with bonus points. It ensures
+    badges are only awarded once per week and handles point transactions.
+    
+    Features implemented:
+    - Weekly adherence percentage calculation
+    - Badge tier determination (gold: 100%, silver: 85%+, bronze: 70%+)
+    - Bonus point awarding and transaction logging
+    - Duplicate badge prevention
+    - Automatic dose log generation for accurate calculations
     """
     from .models import WeeklyConsistencyBadge, AdherenceLog
     

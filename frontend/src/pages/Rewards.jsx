@@ -12,6 +12,15 @@ import {
   Calendar,
 } from "lucide-react";
 
+/*
+  Rewards.jsx
+
+  Displays the patient's gamification dashboard.
+  - Shows total points and current streak.
+  - Lists earned week badges and recent point transactions.
+  - Pulls data from gamification history and summary endpoints.
+*/
+
 const Rewards = () => {
   const navigate = useNavigate();
   const [history, setHistory] = useState({ transactions: [], badges: [] });
@@ -21,6 +30,7 @@ const Rewards = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  // Fetch gamification history and summary on mount to populate points, badges, and transactions.
   useEffect(() => {
     const fetchRewards = async () => {
       try {

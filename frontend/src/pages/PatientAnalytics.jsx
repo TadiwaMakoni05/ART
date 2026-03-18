@@ -21,12 +21,22 @@ import {
   CartesianGrid,
 } from "recharts";
 
+/*
+  PatientAnalytics.jsx
+
+  Displays adherence analytics for a patient.
+  - Shows totals for taken/missed/snoozed doses.
+  - Includes charts for daily trends and weekly adherence percentage.
+  - Pulls data from `/patients/me/analytics/`.
+*/
+
 const PatientAnalytics = () => {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Load analytics data for the current patient on mount.
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
@@ -91,17 +101,23 @@ const PatientAnalytics = () => {
           <div className="bg-white dark:bg-neutral-900 p-3  border border-neutral-100 shadow-sm text-center">
             <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{data.totals.taken}</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Taken</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Taken
+            </p>
           </div>
           <div className="bg-white dark:bg-neutral-900 p-3  border border-neutral-100 shadow-sm text-center">
             <XCircle className="w-6 h-6 text-red-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{data.totals.missed}</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Missed</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Missed
+            </p>
           </div>
           <div className="bg-white dark:bg-neutral-900 p-3  border border-neutral-100 shadow-sm text-center">
             <Clock className="w-6 h-6 text-blue-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{data.totals.snoozed}</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Snoozed</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Snoozed
+            </p>
           </div>
         </div>
 
