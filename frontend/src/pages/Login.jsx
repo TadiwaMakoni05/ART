@@ -32,7 +32,7 @@ const Login = () => {
         navigate("/patient");
       }
     } catch (err) {
-      setError("Invalid credentials", err);
+      setError("Invalid credentials : " + JSON.stringify(err));
     }
   };
 

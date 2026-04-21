@@ -154,6 +154,17 @@ REST_FRAMEWORK = {
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True # For dev only
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF Whitelist for the mobile WebView
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://10.0.2.2:5173",
+    "http://172.16.30.202:5173"
+]
+
+
 
 # Simple JWT
 SIMPLE_JWT = {

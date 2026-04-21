@@ -24,7 +24,6 @@ from .models import (
     ViralLoadResult, ViralLoadReview, ReportFile, PushSubscription
 )
 
-# ... (rest of imports)
 
 class QuoteSerializer(serializers.ModelSerializer):
     """

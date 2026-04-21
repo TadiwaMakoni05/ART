@@ -1,158 +1,163 @@
-# ART Adherence Companion System
+# 💊 ART Adherence Companion Platform
 
-## Short Description
+<div align="center">
+  <p><strong>A comprehensive, full-stack, AI-driven healthcare system designed to monitor, track, and improve Antiretroviral Therapy (ART) medication adherence through gamification, real-time analytics, and direct provider-patient communication.</strong></p>
+</div>
 
-The ART Adherence Companion System is a comprehensive web application designed to help patients manage their Antiretroviral Therapy (ART) medication. It empowers patients through medication tracking, progress analytics, gamified rewards, educational health content, and a direct messaging channel to connect with their healthcare providers. Providers and administrators can efficiently monitor patient adherence and manage system users.
+---
 
-## Problem Statement
+## 📖 1. Project Overview & Problem Statement
 
-For patients relying on life-long medication regimens like ART, strict daily adherence is critical for treatment efficacy and preventing drug resistance. Managing schedules, remembering doses, and lacking direct support can make adherence challenging. This system solves the adherence problem by providing an interactive digital platform that tracks medication habits, offers motivational rewards (gamification), educates the patient, and bridges the communication gap between patients and healthcare providers.
+For patients relying on life-long medication regimens like Antiretroviral Therapy (ART), strict daily adherence is critical for treatment efficacy, immune system maintenance, and preventing drug resistance. Traditional systems rely on memory or simple alarms and lack an ongoing connection between the patient and healthcare providers. 
 
-## Main Features
+The **ART Adherence Companion System** solves this by providing a robust digital platform that bridges this gap. It acts as a holistic digital clinic, tracking medication taking habits, providing AI-driven motivational reinforcement, tracking clinical bloodwork (viral loads), and alerting providers when localized intervention is necessary.
 
-- **Role-Based Access Control**: Secure login and distinct interfaces for Patients, Healthcare Providers, and Administrators.
-- **Progressive Web App (PWA)**: Installable web application with manifest and service worker, providing an app-like experience with offline support capability.
-- **Patient Dashboard & Analytics**: Visual tracking of medication adherence, history logs, and personal health metrics.
-- **Provider & Admin Dashboards**: Overview statistics and real-time monitoring of patient populations for healthcare providers and system administrators.
-- **Viral Load Management**: Dedicated system for providers to track, manage, and review patient viral load test results securely.
-- **Automated Pill Reminders**: Scheduled backend tasks and WhatsApp integration for delivering timely medication alerts directly to patients.
-- **Report Generation**: Capability for providers and admins to generate downloadable adherence reports.
-- **Gamification & Rewards**: A reward system that incentivizes consistent medication adherence by granting points and achievements.
-- **Educational Module (Learn)**: Daily health quotes, tips, and articles to educate and motivate patients.
-- **AI-Powered Chat Assistant**: An integrated AI helper that provides instant, automated, and accurate responses to patient queries regarding their medication, regimen, and general health advice based on validated medical data.
-- **Real-Time Messaging**: Secure, in-app messaging system allowing patients and providers to communicate directly, including image uploads.
-- **Enhanced UX & Responsive Design**: Accessible on all devices featuring refined aesthetics, skeleton loaders for seamless transitions, and custom modal confirmation dialogs.
+## ✨ 2. Core Capabilities & Workflows
 
-## Tech Stack
+The platform leverages Strict Role-Based Access Control (RBAC) to serve three distinct user types: **Patients**, **Providers**, and **Administrators**.
 
-- **Frontend**: React.js (built with Vite), Tailwind CSS for styling, React Router for navigation, Recharts for analytics, and IDB for offline storage handling.
-- **Backend**: Python, Django, and Django REST Framework (DRF) for building robust APIs.
-- **Database**: SQLite (default for development).
-- **Authentication**: JSON Web Tokens (JWT) using `djangorestframework-simplejwt`.
+### 🧑‍⚕️ For Healthcare Providers
+- **Clinical Dashboard & Population Management**: An aggregated data view sorting patients by adherence risk levels and recent missing entries.
+- **Viral Load & Efficacy Tracking**: Providers can log, track, and review lab test results against correlated adherence metrics. 
+- **Automated Alert System**: Background tasks flag patients whose adherence drops below system thresholds.
+- **Direct Messaging**: Secure, two-way direct communication with patients, supporting file and image uploads.
+- **Deep Analytics**: Granular, comprehensive 360-degree views of a patient's prescription schedule, history, and adherence statistics.
 
-## System Architecture
+### 👤 For Patients (Progressive Web App)
+- **Daily Medication Schedules**: An intuitive, mobile-optimized dashboard displaying the day's regimen and allowing one-tap logging (Taken, Missed, Snoozed).
+- **Gamification & Rewards Engine**: To promote consistent behavior, adherence builds 'Streaks' and unlocks 'Points' and 'Badges'.
+- **AI-Powered Virtual Assistant**: Integrated with Google GenAI, a secure chatbot helps patients overcome adherence barriers, answering medical questions safely.
+- **Educational Knowledge Base (`Learn`)**: Daily motivational quotes, wellness tips, and physical/mental health guides.
+- **Push Notifications (PWA)**: Service workers enforce browser notification pushes so patients never miss a dose, even when the app is closed.
 
-The application follows a standard Client-Server architecture. The frontend is a React Single Page Application (SPA) that communicates with the Django backend via stateless RESTful APIs. Authentication is handled using JWTs, which are stored securely on the client and sent with subsequent requests to access protected resources. The backend manages the business logic, database interactions, role verification, and serves media files.
+---
 
-## Folder Structure
+## 🛠️ 3. Comprehensive Technology Stack
+
+The platform employs a decoupled Client-Server architecture.
+
+### **Frontend Application**
+*   **Core Framework**: React 19.x configured as a Single Page Application (SPA).
+*   **Build Environment**: Vite 7.x for High-Performance Module Replacement (HMR) and bundling.
+*   **Styling Engine**: Tailwind CSS 3.x (Utility-first CSS) with custom dark-mode toggle support.
+*   **Data Visualization**: `Recharts` handling dynamic SVG-based statistical charting.
+*   **Networking & Auth**: `Axios` interceptors for JWT injection and silent token refreshing. `jwt-decode` for client-side RBAC derivation.
+*   **Offline Support**: IndexedDB (`idb`) caching local payloads, and native Service Workers (`sw.js`) for PWA installation functionality.
+
+### **Backend Application API**
+*   **Framework**: Python 3.x with Django 6.x and the Django REST Framework (DRF).
+*   **Database**: Relational Database Management tracking everything from `User` roles to `PointTransactions` (SQLite default, PostgreSQL ready).
+*   **Authentication**: JSON Web Tokens (JWT) secured via `djangorestframework-simplejwt`.
+*   **Real-time AI Integration**: Google GenAI (`google-genai` package) invoked via Python service controllers.
+*   **Background Jobs & Notifications**: Leverages `pywebpush` alongside VAPID cryptography for Web Push payloads.
+*   **Media Processing**: `Pillow` handling compression and verification of chat attachments.
+
+---
+
+## 🗺️ 4. System Architecture & Topology
+
+The system uses RESTful JSON payloads over HTTPs. 
+
+1. **Authentication Flow**: Users POST to `api/auth/token/`. The backend verifies credentials and signs an `access` and `refresh` JWT pair. The React client intercepts all subsequent secure requests, appending the bearer access token, managing the session autonomously.
+2. **Thick-Backend / Thin-Client**: Complex relational data aggregation (e.g., matching a `Patient` with their active `Prescriptions`, matching that to `MedicationSchedules`, and summarizing historical `AdherenceLogs` for a 30-day chart) is completed in Django via `django.db.models.functions` to drastically reduce client-side computational load.
+3. **Background Mechanics**: When a patient logs a pill as 'Taken', a Django Signal automatically intercepts the save event. This triggers a Gamification Engine recalculation—awarding points, verifying streak status, and evaluating badge criteria within the same database transaction.
+
+*For detailed sequence, entity-relationship, and C4 mapping diagrams, refer to [`ARCHITECTURE.md`](./ARCHITECTURE.md).*
+
+---
+
+## 📂 5. Directory Blueprint
 
 ```text
 ART/
-├── art_backend/                # Django Backend Application
-│   ├── adherence/              # Main app containing models, views, and APIs
-│   ├── art_backend/            # Django project settings and root routing
-│   ├── media/                  # User-uploaded files (e.g., chat images)
-│   ├── manage.py               # Django execution script
-│   └── requirements.txt        # Python dependencies
+├── art_backend/                # Core Django Server & DRF Application
+│   ├── adherence/              # The primary application module 
+│   │   ├── models.py           # Relational schema (Users, Tasks, Messages, Logs)
+│   │   ├── views.py            # APIViewSet, APIView logical controllers
+│   │   ├── serializers.py      # JSON Transformation and DRF Data Validation
+│   │   ├── signals.py          # Reactive Background Database Triggers (Gamification)
+│   │   ├── permissions.py      # Access boundary classes (IsPatient, IsProvider)
+│   │   └── utils.py            # Third-Party API wrappers (GenAI, PushWeb)
+│   ├── art_backend/            # Configuration Root & Base Routing
+│   └── manage.py               # Django Application Runner
 │
-└── frontend/                   # React Frontend Application
-    ├── public/                 # Static public assets
+└── frontend/                   # Client-Side React/Vite PWA
+    ├── public/                 # PWA Manifest, Service Workers (sw.js), Vector Assets
     ├── src/
-    │   ├── components/         # Reusable UI components and layout wrappers
-    │   ├── context/            # React Context (e.g., AuthProvider)
-    │   ├── pages/              # Application screens (Dashboards, Login, etc.)
-    │   ├── App.jsx             # Main React component and Router setup
-    │   └── index.css           # Global Tailwind CSS styles
-    ├── package.json            # Node.js dependencies and scripts
-    └── vite.config.js          # Vite configuration
+    │   ├── components/         # Shared stateless components, HOCs, and Layout Wrappers
+    │   ├── context/            # React Context (AuthProvider, ThemeProvider)
+    │   ├── pages/              # Routed Views (Dashboard, Analytics, Messenger)
+    │   ├── api.js              # Centralized Axios configuration and Interceptors
+    │   └── App.jsx             # React Router DOM mappings
+    └── tailwind.config.js      # Global UI Token Definitions
 ```
 
-- **`art_backend/adherence/`**: Contains the core logic for users, patients, medications, adherence records, and messages.
-- **`frontend/src/pages/`**: Holds all the distinct visible screens categorized by user roles (Admin, Provider, Patient, and Shared).
+---
 
-## API Overview
+## 🚀 6. Installation & Deployment Guide
 
-Here are some of the primary API endpoints exposed by the backend:
+Follow these steps to establish a local development environment. Both applications must run simultaneously for full operation.
 
-- **Authentication**:
-  - `POST /api/auth/token/` - Obtain JWT access and refresh tokens.
-  - `POST /api/auth/token/refresh/` - Refresh an expired access token.
-- **Dashboards & Analytics**:
-  - `GET /api/providers/me/dashboard/` - Fetch overview statistics for the logged-in provider.
-  - `GET /api/patients/me/analytics/` - Retrieve personal adherence analytics for the logged-in patient.
-  - `GET /api/admin/dashboard/` - Fetch system-wide statistics for administrators.
-- **Resources (CRUD)**:
-  - `/api/patients/` - Manage patient profiles.
-  - `/api/medications/` - Manage medication types and details.
-  - `/api/prescriptions/` - Manage patient prescriptions.
-  - `/api/adherence/` - Record and retrieve medication adherence logs.
-- **Communication & Engagement**:
-  - `/api/messages/` - Send and receive real-time messages between users.
-  - `/api/chat/assistant/` - Interact with the AI-powered chatbot helper for automated adherence support.
-  - `GET /api/learn/home-quotes/` - Fetch educational quotes for the Learn section.
-  - `/api/gamification/` - Manage reward points and streaks.
+### A. Environment Configuration
 
-## Installation & Setup
+1. You'll need credentials for **Google GenAI / Gemini** and **VAPID Keys** for web push functionality.
+2. Ensure you have modern versions of **Node.js** (v18+) and **Python** (v3.10+).
 
-### Backend Setup
+### B. Bootstrapping the Backend (Django)
 
-1. Navigate to the backend directory:
+1. Open a terminal and navigate to the backend directory:
    ```bash
    cd art_backend
    ```
-2. Create and activate a virtual environment (recommended):
+2. Create an isolated Python Environment:
    ```bash
    python -m venv env
-   # Windows:
+   # Activate Environment (Windows):
    env\Scripts\activate
-   # macOS/Linux:
+   # Activate Environment (macOS/Unix):
    source env/bin/activate
    ```
-3. Install the required Python packages:
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-4. Run the database migrations:
+4. Prepare the Database and execute Migrations:
    ```bash
+   python manage.py makemigrations 
    python manage.py migrate
    ```
-5. _(Optional)_ Seed the database with initial data or create a superuser.
-6. Start the Django development server:
+5. *(Optional but Recommended)* Create a superuser to access the admin portal:
+   ```bash
+   python manage.py createsuperuser
+   ```
+6. Launch the development server:
    ```bash
    python manage.py runserver
    ```
-   The backend will typically run on `http://127.0.0.1:8000/`.
+   > The Backend API operates on `http://127.0.0.1:8000/`. The raw browsable API can be accessed depending on route configurations.
 
-### Frontend Setup
+### C. Bootstrapping the Frontend (React)
 
-1. Open a new terminal and navigate to the frontend directory:
+1. Open a new terminal instance and enter the frontend directory:
    ```bash
    cd frontend
    ```
-2. Install the necessary Node.js dependencies:
+2. Install npm node modules:
    ```bash
    npm install
    ```
-3. Start the Vite development server:
+3. Boot the Vite high-performance development server:
    ```bash
    npm run dev
    ```
-   The frontend will typically run on `http://localhost:5173/`.
+   > The Frontend Client operates on `http://localhost:5173/`. 
 
-## How the App Works (User Flow)
+---
 
-The application flow adapts based on the user's role upon logging in:
+## 📚 7. Extended Developer Documentation
 
-1. **Landing Page**: Users arrive at the introductory landing page.
-2. **Authentication**: Users log in via the `/login` screen. The backend returns a JWT containing their role, which dictates navigation.
-3. **Patient Flow**:
-   - Directed to the **Patient Home**.
-   - Can log today's medication.
-   - Navigate to **Analytics** to view adherence trends.
-   - Visit **Rewards** to track gamification points.
-   - Go to **Learn** for educational content.
-   - Use **Messages** to contact their provider securely.
-4. **Provider Flow**:
-   - Directed to the **Provider Dashboard** for an overview of their assigned patients.
-   - Can view the **Patients List** and access specific **Patient Details**.
-   - Can add new patients to the system.
-   - Monitor adherence alerts and use **Messages** to follow up with patients.
-5. **Admin Flow**:
-   - Directed to the **Admin Dashboard** to view system-wide metrics.
-   - Can manage system users (**Providers** and **Patients**) through dedicated list views.
+Because the system is dense and feature-rich, detailed underlying technical specifics have been sectioned into dedicated markdown documents:
 
-## Future Improvements
-
-- **Native Push Notifications**: Build upon the existing WhatsApp alerts to include native browser push notifications for pill reminders and upcoming appointments.
-- **Interoperability**: Integrate with existing Electronic Medical Record (EMR) or Health Information Systems (HIS) using HL7/FHIR standards.
-- **Advanced Offline Synchronization**: Further enhance the existing Service Worker and IndexedDB integration for robust offline caching and data sync resolutions.
+1. 🏛️ **[ARCHITECTURE.md](./ARCHITECTURE.md)**: Contains explicit Entity-Relationship data model mappings, Sequence flows, C4 Component Diagrams, and UML charts mapping the entire platform structure.
+2. 🖧 **[BACKEND.md](./BACKEND.md)**: Expands heavily on the structural principles behind the Django application, DRF routing layers, API endpoints, Gamification Background Handlers, and Web Push Service integration.
+3. 💻 **[FRONTEND.md](./FRONTEND.md)**: Details the layout architecture, React routing security implementations (RBAC `ProtectedRoute`), Service Worker Offline strategies, state management techniques, and component hierarchies.
