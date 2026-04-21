@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import ViralLoadPredictor from "../components/ViralLoadPredictor";
 
 /*
   PatientDetail.jsx
@@ -751,6 +752,11 @@ const PatientDetail = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+          
+          {/* AI Viral Load Predictor */}
+          <div className="lg:col-span-3">
+             <ViralLoadPredictor />
           </div>
         </div>
       </div>

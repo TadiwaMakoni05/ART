@@ -1,0 +1,10 @@
+{
+  "executionEnvironments": [
+    {
+      "root": "art_backend"
+    }
+  ],
+  "extraPaths": [
+    "art_backend"
+  ]
+}

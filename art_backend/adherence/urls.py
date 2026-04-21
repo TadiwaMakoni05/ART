@@ -10,7 +10,7 @@ from .views import (
     MyTokenObtainPairView, GamificationViewSet, QuoteView, AnalyticsView,
     AdminDashboardView, AdminUserViewSet, ProviderViewSet, MessageViewSet,
     PrescriptionViewSet, ViralLoadResultViewSet, DownloadReportView,
-    AIChatView, PushSubscribeView
+    AIChatView, PushSubscribeView, PredictViralLoadView
 )
 
 router = DefaultRouter()
@@ -40,6 +40,7 @@ urlpatterns = [
     path('reports/<int:pk>/download/', DownloadReportView.as_view(), name='download-report'),
     
     path('push/subscribe/', PushSubscribeView.as_view(), name='push-subscribe'),
+    path('predict-viral-load/', PredictViralLoadView.as_view(), name='predict-viral-load'),
     
     path('', include(router.urls)),
 ]

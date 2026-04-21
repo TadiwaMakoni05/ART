@@ -1195,3 +1195,44 @@ class PushSubscribeView(views.APIView):
             )
             return Response({"status": "subscribed", "created": created}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from ml.predictor import predict_viral_load
+
+class PredictViralLoadView(views.APIView):
+    """
+    AI-Powered Viral Load Prediction API
+    
+    Expects POST data:
+    - adherence_rate
+    - missed_doses
+    - time_on_art_months
+    - previous_viral_load
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            adherence_rate = request.data.get('adherence_rate')
+            missed_doses = request.data.get('missed_doses')
+            time_on_art_months = request.data.get('time_on_art_months')
+            previous_viral_load = request.data.get('previous_viral_load')
+
+            # Ensure all required fields are provided
+            if None in [adherence_rate, missed_doses, time_on_art_months, previous_viral_load]:
+                return Response(
+                    {"error": "Missing required fields (adherence_rate, missed_doses, time_on_art_months, previous_viral_load)"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Predict
+            prediction = predict_viral_load(
+                adherence_rate=float(adherence_rate),
+                missed_doses=float(missed_doses),
+                time_on_art_months=float(time_on_art_months),
+                previous_viral_load=float(previous_viral_load)
+            )
+
+            return Response({"prediction": prediction}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

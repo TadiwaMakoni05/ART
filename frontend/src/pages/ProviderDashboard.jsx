@@ -14,6 +14,7 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
+import ViralLoadPredictor from "../components/ViralLoadPredictor";
 
 /*
   ProviderDashboard.jsx
@@ -181,6 +182,10 @@ const ProviderDashboard = () => {
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <ViralLoadPredictor />
       </div>
     </div>
   );
