@@ -42,6 +42,20 @@ from .services import generate_viral_load_review
 import os
 from google import genai
 from google.genai import types
+from .permissions import IsProvider, IsPatient, IsAdmin, IsOwnerOrProvider
+from rest_framework_simplejwt.views import TokenObtainPairView
+import random
+import string
+import re
+from .services.reports import generate_adherence_report, generate_viral_load_report
+from .utils import generate_daily_doses, check_weekly_badges
+from .models import SystemSettings, ReportFile, PushSubscription
+from django.conf import settings
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+from .serializers import PushSubscriptionSerializer
+from ml.predictor import predict_viral_load
+
 
 class QuoteView(views.APIView):
     """
@@ -191,12 +205,6 @@ class AnalyticsView(views.APIView):
             "weekly_trend": weekly_trend
         })
 
-from .permissions import IsProvider, IsPatient, IsAdmin, IsOwnerOrProvider
-from rest_framework_simplejwt.views import TokenObtainPairView
-import random
-import string
-import re
-
 class MyTokenObtainPairView(TokenObtainPairView):
     """
     Custom JWT Token Authentication View
@@ -341,7 +349,6 @@ class PatientViewSet(viewsets.ModelViewSet):
              return Response({"error": "Not authorized for this patient"}, status=status.HTTP_403_FORBIDDEN)
              
         # Generate the report
-        from .services.reports import generate_adherence_report
         report_text = generate_adherence_report(patient_profile.id, request.user.id)
         
         # Create CounselingMessage
@@ -487,11 +494,9 @@ class ViralLoadResultViewSet(viewsets.ModelViewSet):
             # Save the result
             instance = serializer.save(patient=patient, entered_by=user)
             # Generate the review
-            from .services import generate_viral_load_review
             generate_viral_load_review(instance.id)
             
             # Generate Viral Load Report
-            from .services.reports import generate_viral_load_report
             report_text = generate_viral_load_report(instance.id)
             
             # Auto-create chat message
@@ -537,7 +542,6 @@ class AdherenceViewSet(viewsets.ModelViewSet):
         if user.role == 'patient':
             # Lazy generation for requested range or today
             try:
-                from .utils import generate_daily_doses
                 today = timezone.now().date()
                 
                 # Determine dates to generate
@@ -609,7 +613,6 @@ class AdherenceViewSet(viewsets.ModelViewSet):
             except ValueError:
                 return Response({"error": "Invalid scheduled_time format"}, status=status.HTTP_400_BAD_REQUEST)
             
-            from .models import SystemSettings
             settings_obj = SystemSettings.load()
             
             now = timezone.now()
@@ -638,7 +641,6 @@ class AdherenceViewSet(viewsets.ModelViewSet):
         if request.data.get('status') == 'taken':
             scheduled_time = instance.scheduled_time
             
-            from .models import SystemSettings
             settings_obj = SystemSettings.load()
             
             now = timezone.now()
@@ -859,7 +861,6 @@ class AIChatView(views.APIView):
             return Response({"error": "Message is required"}, status=status.HTTP_400_BAD_REQUEST)
             
         # Get GEMINI_API_KEY from environment
-        from django.conf import settings
         
         # Try from OS env first
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -960,7 +961,6 @@ class ProviderViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.filter(role='provider')
 
-
 class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Gamification System API ViewSet
@@ -991,7 +991,6 @@ class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
             profile = user.patient_profile.gamification_profile
             # Lazy check for badges
             try:
-                from .utils import check_weekly_badges
                 check_weekly_badges(user.patient_profile)
                 # Reload profile to get updated points
                 profile.refresh_from_db()
@@ -1019,7 +1018,6 @@ class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
             patient = user.patient_profile
             # Lazy check for badges
             try:
-                from .utils import check_weekly_badges
                 check_weekly_badges(patient)
             except Exception as e:
                 print(f"Error checking badges: {e}")
@@ -1034,7 +1032,6 @@ class GamificationViewSet(viewsets.ReadOnlyModelViewSet):
             "transactions": PointTransactionSerializer(transactions, many=True).data,
             "badges": WeeklyConsistencyBadgeSerializer(badges, many=True).data
         })
-
 
 # -------------------------------------------------------------------------
 # ADMIN VIEWS
@@ -1123,10 +1120,6 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             user.set_password(self.request.data['password'])
             user.save()
 
-from django.http import FileResponse
-from django.shortcuts import get_object_or_404
-from .models import ReportFile
-
 class DownloadReportView(views.APIView):
     """
     Report File Download API View
@@ -1161,9 +1154,6 @@ class DownloadReportView(views.APIView):
             
         return FileResponse(report.file.open('rb'), as_attachment=True, filename=report.file.name.split('/')[-1])
 
-from .serializers import PushSubscriptionSerializer
-from .models import PushSubscription
-
 class PushSubscribeView(views.APIView):
     """
     Push Notification Subscription API View
@@ -1195,8 +1185,6 @@ class PushSubscribeView(views.APIView):
             )
             return Response({"status": "subscribed", "created": created}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-from ml.predictor import predict_viral_load
 
 class PredictViralLoadView(views.APIView):
     """
